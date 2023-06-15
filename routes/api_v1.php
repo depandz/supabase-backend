@@ -32,6 +32,7 @@ Route::group(['as' => 'api_v1.'], function () {
     });
     //driver 
     Route::controller(DriverController::class)->prefix('drivers')->group(function(){
+        Route::get('/','index');
         Route::post('/login','login');
         Route::get('{s_id}','show');
         Route::put('{s_id}/update','update');

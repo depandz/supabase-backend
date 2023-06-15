@@ -24,7 +24,7 @@ class DriverDTO
         public ?float $capacity = null,
         public ?int $licence_plate = null,
         public ?bool $is_online = false,
-        public ?int $company_id = null,
+        public ?object $company = null,
         public ?bool $is_default_for_company = false,
         public ?bool $can_transport_goods = false,
 

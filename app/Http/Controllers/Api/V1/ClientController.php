@@ -144,15 +144,22 @@ class ClientController extends Controller
                 ]);
                 $validated['phone_number'] = ltrim($validated['phone_number'], '+');
         
-                $client = $this->client_contract->findBy('phone_number',$validated['phone_number']);
+                $clients = $this->client_contract->findBy('phone_number',$validated['phone_number']);
 
-                if($client)
+                if($clients && count($clients))
                 {
-                return $this->api_responser
-                    ->success()
-                    ->message('Client logged in successfully')
-                    ->payload($client[0])
-                    ->send();
+                    if($clients[0]->account_status != 'active'){
+                    return $this->api_responser
+                        ->failed()
+                        ->code(403)
+                        ->message('Your Account is '.$clients[0]->account_status.' please contact the support team')
+                        ->send();
+                    }
+                    return $this->api_responser
+                        ->success()
+                        ->message('Client logged in successfully')
+                        ->payload($clients[0])
+                        ->send();
                 }
 
             }

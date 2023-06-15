@@ -21,11 +21,11 @@ class Client implements ClientContract
 
     public function fetchAll(): Collection
     {
-        //TODO:only account active client
+        
         $clients = Collection::make($this->db_instance->fetchAll()->getResult())
                                 ->map(function ($item) {
                                     $item = (array) $item;
-                                    //TODO: get all attribute of item
+                                   
                                     return new ClientObject(
                                         $item['id'],
                                         $item['s_id'],
@@ -47,12 +47,14 @@ class Client implements ClientContract
 
     public function findByLike($column, $value): Collection
     {
-         //TODO:only account active client
+         
         try {
-            $clients = Collection::make($this->db_instance->findByLike($column, $value)->getResult())
+            $clients = Collection::make($this->db_instance
+                                    ->findByLike($column, $value)
+                                    ->getResult())
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                        //TODO: get all attribute of item
+                                        
                                         return new ClientObject(
                                             $item['id'],
                                             $item['s_id'],
@@ -77,12 +79,15 @@ class Client implements ClientContract
     }
     public function findBy($column, $value): Collection
     {
-         //TODO:only account active client
+         
         try {
-            $clients = Collection::make($this->db_instance->findBy($column, $value)->getResult())
+            $clients = Collection::make($this->db_instance
+                                    ->findBy($column, $value)
+                                    ->getResult()
+                                    )
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                        //TODO: get all attribute of item
+                                        
                                         return new ClientObject(
                                             $item['id'],
                                             $item['s_id'],
