@@ -18,7 +18,7 @@ class Province implements ProvinceContract
 
     public function fetchAll(): Collection
     {
-        $provinces = Collection::make($this->db_instance->fetchAll()->getResult())->map(fn ($item) => new ProvinceObject($item->code, $item->name));
+        $provinces = Collection::make($this->db_instance->fetchAll()->getResult())->map(fn ($item) => new ProvinceObject($item->code, $item->name,$item->name_ar,$item->longitude,$item->latitude));
 
         return $provinces;
     }
@@ -28,7 +28,7 @@ class Province implements ProvinceContract
         try {
             $province = $this->db_instance->findBy('code', $code)->getResult();
 
-            return new ProvinceObject($province[0]?->code, $province[0]?->name);
+            return new ProvinceObject($province[0]?->code, $province[0]?->name, $province[0]?->name_ar,$province[0]?->longitude,$province[0]?->latitude);
         } catch (Exception $ex) {
             throw $ex;
         }
@@ -49,7 +49,7 @@ class Province implements ProvinceContract
     public function findByLike($column, $value): Collection
     {
         try {
-            $provinces = Collection::make($this->db_instance->findByLike($column, $value)->getResult())->map(fn ($item) => new ProvinceObject($item->code, $item->name));
+            $provinces = Collection::make($this->db_instance->findByLike($column, $value)->getResult())->map(fn ($item) => new ProvinceObject($item->code, $item->name,$item->name_ar,$item->longitude,$item->latitude));
 
             return $provinces;
         } catch (Exception $ex) {

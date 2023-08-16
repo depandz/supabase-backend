@@ -14,7 +14,9 @@
         "rafaelwendel/phpsupabase": "^0.0.5"
     },
     "require-dev": {
+        "doctrine/dbal": "^3.6",
         "fakerphp/faker": "^1.9.1",
+        "laravel-shift/blueprint": "^2.7",
         "laravel/pint": "^1.0",
         "laravel/sail": "^1.18",
         "mockery/mockery": "^1.4.4",
@@ -34,8 +36,10 @@
             "App\\Enums\\": "Enums"
         },
         "files": [
+            "app/Helpers/Authentication.php",
             "app/Services/SupaBaseInitializer.php",
-            "app/Helpers/GlobalHelpers.php"
+            "app/Helpers/GlobalHelpers.php",
+            "app/Helpers/ErrorHandler.php"
         ]
     },
     "autoload-dev": {

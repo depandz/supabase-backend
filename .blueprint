@@ -1,0 +1,31 @@
+created:
+    - database/factories/ProvinceFactory.php
+    - database/factories/ClientFactory.php
+    - database/factories/DriverFactory.php
+    - database/factories/PickupRequestFactory.php
+    - database/factories/FeeFactory.php
+    - database/factories/CompanyFactory.php
+    - database/factories/RatingFactory.php
+    - database/migrations/2023_08_15_131733_create_provinces_table.php
+    - database/migrations/2023_08_15_131734_create_clients_table.php
+    - database/migrations/2023_08_15_131735_create_drivers_table.php
+    - database/migrations/2023_08_15_131736_create_pickup_requests_table.php
+    - database/migrations/2023_08_15_131737_create_fees_table.php
+    - database/migrations/2023_08_15_131738_create_companies_table.php
+    - database/migrations/2023_08_15_131739_create_ratings_table.php
+    - app/Models/Province.php
+    - app/Models/Client.php
+    - app/Models/Driver.php
+    - app/Models/PickupRequest.php
+    - app/Models/Fee.php
+    - app/Models/Company.php
+    - app/Models/Rating.php
+models:
+    User: {  }
+    Province: { id: id, name: 'string unique', code: 'smallInteger unique' }
+    Client: { id: id, s_id: 'string unique', full_name: string, phone_number: string, gender: 'enum default:"male" comment:"male or female"', location: 'json nullable', email: 'string nullable', photo: 'bigInteger nullable', messaging_token: 'string nullable', reported_count: 'integer unsigned', account_status: 'enum:pending,active,suspended default:"pending" comment:"pending / active / suspended"', registered_at: 'dateTime nullable' }
+    Driver: { id: id, s_id: 'string unique', full_name: string, phone_number: string, gender: 'enum default:"male" comment:"male or female"', identity_card_number: 'integer unique', licence_plate: 'mediumInteger nullable', photo: 'string nullable', province_id: 'smallInteger foreign:province.id', location: 'json nullable', email: 'string unique nullable', is_online: 'boolean comment:"0  is offline , 1 is online"', reported_count: 'integer unsigned', messaging_token: 'string nullable', account_status: 'enum:pending,active,suspended default:"pending" comment:"pending / suspended / active"', vehicle_type: 'string default:"light" comment:"light / heavy / truck"', commercial_register_number: mediumInteger, capacity: 'integer unsigned', company_id: 'bigInteger nullable foreign:company.id', is_default_for_company: 'boolean default:false', can_transport_goods: 'boolean default:false' }
+    PickupRequest: { id: id, sid: 'string unique nullable', client_id: 'bigInteger unsigned foreign:clients.id', driver_id: 'bigInteger nullable unsigned foreign:drivers.id', destination: 'json nullable', location: 'json nullable', date_requested: dateTime, estimated_price: double, estimated_distance: float, estimated_time: integer, state: 'enum:0,1,2,3,4 comment:\"{\n    initialized = 0,\n    pending = 1,\n    approved = 2,\n    cancelled = 3,\n    validated = 4,\n}\""', total: double, vehicle_type: 'enum:light,heavy,truck default:"light" comment:"light / heavy / truck"', is_vehicle_empty: 'boolean default:true', vehicle_licence_plate: mediumInteger, updated_at: 'dateTime nullable' }
+    Fee: { id: id, province_id: 'bigInteger unique unsigned foreign:province.id', heavy: 'float default:0', light: 'float default:0', truck: 'float default:0', full_percentage: 'integer unsigned' }
+    Company: { id: id, name: bigInteger, email: 'string nullable', phone_number: string, address: string }
+    Rating: { id: id, client_id: 'bigInteger unsigned foreign:clients.id', driver_id: 'bigInteger unsigned foreign:drivers.id', value: 'enum comment:"rating from 1 to 5"', comment: 'tinyText nullable' }

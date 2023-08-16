@@ -23,6 +23,8 @@ Route::group(['as' => 'api_v1.'], function () {
 
     //clients 
     Route::controller(ClientController::class)->prefix('clients')->group(function(){
+        Route::post('otp/send','sendOtp');
+        Route::post('otp/verify','verifyOtp');
         Route::get('/','index');
         Route::post('/register','register');
         Route::post('/login','login');

@@ -6,21 +6,25 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Contracts\ClientContract;
 use App\Http\Controllers\Controller;
+use App\Services\Locale\Client as ClientRepository;
 use App\Http\Requests\ClientUpdateRequest;
+use App\Models\Client;
 
 class ClientController extends Controller
 {
-        public $api_responser;
+     
 
         public $client_contract;
-
+        protected $repository;
         /**
          * @var ClientContract
+         * @var ClientRepository
          */
-        public function __construct(ClientContract $client_contract)
+        public function __construct(ClientContract $client_contract,ClientRepository $repository)
         {
             parent::__construct();
             $this->client_contract = $client_contract;
+            $this->repository = $repository;
         }
 
         public function index()
@@ -117,6 +121,115 @@ class ClientController extends Controller
                     ->message($ex->getMessage())
                     ->send();
             }
+        }
+           /**
+        * @OA\Post(
+        * path="/api/v1/clients/otp/send",
+        * operationId="send_client_otp",
+        * tags={"clients"},
+        * summary="send otp to a client using phone number",
+        *     @OA\RequestBody(
+        *         @OA\JsonContent(),
+        *         @OA\MediaType(
+        *            mediaType="application/x-www-form-urlencoded",
+        *             @OA\Schema(
+        *                 @OA\Property(property="phone_number",type="string",example="+213664419425"),
+        *             )),
+        *    ),
+        *    @OA\Response( response=200, description="The otp sended successfully", @OA\JsonContent() ),
+        *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+        *     )
+        */
+        public function sendOtp(Request $request)
+        {
+            try {
+                $validated = $request->validate([
+                    'phone_number' => 'required|regex:/^\+213[567]\d{8}$/',
+                ]);
+                // $validated['phone_number'] = ltrim($validated['phone_number'], '+');
+                $client = Client::whereDeletedAt(null)
+                ->where('phone_number', $request->phone_number)
+                ->where('account_status', "blocked")
+                ->first();
+                if ($client) {
+                    return $this->api_responser->failed()->code(401)
+                        ->message("Your account was suspended ,please contact the support team")
+                        ->send();
+                }
+                $otp = generate_otp($request->phone_number, 'Client');
+                return sendSMS($request->phone_number, 'Your OTP Verification code is ', $otp, 'client');
+
+            }
+            catch(Exception $ex){
+                
+                return $this->api_responser
+                    ->failed($ex->getCode())
+                    ->message($ex->getMessage())
+                    ->send();
+            }
+        }
+         /**
+     * @OA\Post(
+     * path="/api/v1/clients/otp/verify",
+     * operationId="loginClientWithOtp",
+     * tags={"clients"},
+     * summary="verify client otp code if match to login",
+     * description="verify client otp code if match to login using the phone_number and the otp",
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="phone_number",type="string",example="+213664419425"),
+     *                 @OA\Property(property="otp",type="string",example="55555")
+     *             ) ),
+     *    ),
+     *      @OA\Response( response=200,description="The verification passed successfully",@OA\JsonContent()),
+     *      @OA\Response( response=422,description="Your OTP Or Phone Number is not correct",@OA\JsonContent()),
+     *      @OA\Response( response=419,description="Your OTP has been expired",@OA\JsonContent()),
+     *      @OA\Response(response=500,description="internal server error",@OA\JsonContent())
+     *     )
+     */
+        public function verifyOtp(Request $request)
+    {
+        /* Validation */
+        $request->validate([
+            'phone_number' => 'required|regex:/^(\+\d{1,2}\d{10})$/',
+            'otp' => 'required'
+        ]);
+
+        try {
+            $client  = $this->repository
+            ->findByPhone($request->phone_number);
+            //if otp is correct
+            if($client && $client->otp_verification_code != $request->otp){
+                return $this->api_responser->success()
+                        ->code(401)
+                        ->message("Your OTP is not correct, Please Verify")
+                        ->send();
+            }
+            $now = now();
+
+            if ($client && $now->isAfter($client->otp_expire_at)) {
+                return $this->api_responser->failed()->code(419)
+                    ->message('Your OTP has been expired')
+                    ->send();
+            }
+
+            //validate the otp
+            $client->otp_verification_code =  null;
+            $client->otp_expire_at =  now();
+            $client->save();
+
+            return $this->api_responser->success()
+                ->message('The verification passed successfully')
+                ->payload([
+                    'token' => $client->createToken('mobile', ['role:client', 'client:update'])->plainTextToken,
+                ])
+                ->send();
+        } catch (Exception $ex) {
+            return handleTwoCommunErrors($ex, "No client Found with the given phone number");
+        }
     }
         /**
         * @OA\Post(
@@ -136,6 +249,7 @@ class ClientController extends Controller
         *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
         *     )
         */
+        
         public function login(Request $request)
         {
             try {
