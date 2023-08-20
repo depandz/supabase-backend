@@ -22,10 +22,11 @@ class ClientUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'full_name' => 'sometimes|nullable|string|max:100',
-           'phone_number' => 'sometimes|nullable|string|max:100',
-        //    'gender' => 'sometimes|nullable|in:male,female',
-           'location' => 'sometimes|nullable|json',
+           'first_name' => 'sometimes|nullable|string|max:150',
+           'last_name' => 'sometimes|nullable|string|max:150',
+           'phone_number' => 'sometimes|nullable|string|max:150',
+           'gender' => 'sometimes|nullable|in:male,female',
+        //    'location' => 'sometimes|nullable|json',
            'email' => 'sometimes|nullable|string|max:100',
         //    'photo' => 'sometimes|nullable|string|image|mimes:jpg,jpeg,webp,bmp,png,gif,svg',
            'messaging_token' => 'sometimes|nullable|string|max:100',

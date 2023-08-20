@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\DriverController;
 use App\Http\Controllers\Api\V1\ProvinceController;
@@ -20,14 +21,15 @@ Route::group(['as' => 'api_v1.'], function () {
     //provinces
     Route::get('provinces', [ProvinceController::class, 'index']);
     Route::get('provinces/find-by-code/{code}', [ProvinceController::class, 'findByCode']);
-
+    Route::post('otp/send',[AuthController::class, 'sendOtp']);
+    Route::post('otp/verify',[AuthController::class, 'verifyOtp']);
     //clients 
     Route::controller(ClientController::class)->prefix('clients')->group(function(){
-        Route::post('otp/send','sendOtp');
-        Route::post('otp/verify','verifyOtp');
+        // Route::post('otp/send','sendOtp');
+        // Route::post('otp/verify','sendOtp');
         Route::get('/','index');
         Route::post('/register','register');
-        Route::post('/login','login');
+        // Route::post('/login','login');
         Route::get('{s_id}','show');
         Route::put('{s_id}/update','update');
         Route::post('{s_id}/update-photo','updatePhoto');

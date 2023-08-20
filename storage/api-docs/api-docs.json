@@ -8,6 +8,131 @@
         "version": "1.0.0"
     },
     "paths": {
+        "/api/v1/otp/send": {
+            "post": {
+                "tags": [
+                    "commun"
+                ],
+                "summary": "send otp to a client or driver using phone number",
+                "operationId": "send_otp_code",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "+213664419425"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The otp sended successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/otp/verify": {
+            "post": {
+                "tags": [
+                    "commun"
+                ],
+                "summary": "verify otp code if match to login",
+                "description": "verify otp code if match to login using the phone_number and the otp",
+                "operationId": "verify_sended_otp",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "phone_number": {
+                                        "type": "string",
+                                        "example": "+213664419425"
+                                    },
+                                    "otp": {
+                                        "type": "string",
+                                        "example": "55555"
+                                    },
+                                    "operation_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "register",
+                                            "login"
+                                        ]
+                                    },
+                                    "auth_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "client",
+                                            "driver"
+                                        ]
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "The verification passed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "422": {
+                        "description": "Your OTP Or Phone Number is not correct",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "419": {
+                        "description": "Your OTP has been expired",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/clients/{s_id}": {
             "get": {
                 "tags": [
@@ -64,13 +189,28 @@
                         "application/x-www-form-urlencoded": {
                             "schema": {
                                 "properties": {
-                                    "full_name": {
+                                    "first_name": {
                                         "type": "string",
-                                        "example": "full Name"
+                                        "example": "first Name"
+                                    },
+                                    "last_name": {
+                                        "type": "string",
+                                        "example": "last Name"
                                     },
                                     "phone_number": {
                                         "type": "string",
                                         "example": "+213664419425"
+                                    },
+                                    "email": {
+                                        "type": "string",
+                                        "example": "email@email.com"
+                                    },
+                                    "gender": {
+                                        "type": "string",
+                                        "enum": [
+                                            "male",
+                                            "female"
+                                        ]
                                     }
                                 },
                                 "type": "object"
@@ -84,162 +224,6 @@
                 "responses": {
                     "200": {
                         "description": "Client registered successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/clients/otp/send": {
-            "post": {
-                "tags": [
-                    "clients"
-                ],
-                "summary": "send otp to a client using phone number",
-                "operationId": "send_client_otp",
-                "requestBody": {
-                    "content": {
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "properties": {
-                                    "phone_number": {
-                                        "type": "string",
-                                        "example": "+213664419425"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        },
-                        "application/json": {
-                            "schema": {}
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "The otp sended successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/clients/otp/verify": {
-            "post": {
-                "tags": [
-                    "clients"
-                ],
-                "summary": "verify client otp code if match to login",
-                "description": "verify client otp code if match to login using the phone_number and the otp",
-                "operationId": "loginClientWithOtp",
-                "requestBody": {
-                    "content": {
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "properties": {
-                                    "phone_number": {
-                                        "type": "string",
-                                        "example": "+213664419425"
-                                    },
-                                    "otp": {
-                                        "type": "string",
-                                        "example": "55555"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        },
-                        "application/json": {
-                            "schema": {}
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "The verification passed successfully",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "422": {
-                        "description": "Your OTP Or Phone Number is not correct",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "419": {
-                        "description": "Your OTP has been expired",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    },
-                    "500": {
-                        "description": "internal server error",
-                        "content": {
-                            "application/json": {
-                                "schema": {}
-                            }
-                        }
-                    }
-                }
-            }
-        },
-        "/api/v1/clients/login": {
-            "post": {
-                "tags": [
-                    "clients"
-                ],
-                "summary": "login a client using phone number",
-                "operationId": "login_client",
-                "requestBody": {
-                    "content": {
-                        "application/x-www-form-urlencoded": {
-                            "schema": {
-                                "properties": {
-                                    "phone_number": {
-                                        "type": "string",
-                                        "example": "+213664419425"
-                                    }
-                                },
-                                "type": "object"
-                            }
-                        },
-                        "application/json": {
-                            "schema": {}
-                        }
-                    }
-                },
-                "responses": {
-                    "200": {
-                        "description": "Client logged in successfully",
                         "content": {
                             "application/json": {
                                 "schema": {}

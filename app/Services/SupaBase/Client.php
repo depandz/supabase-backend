@@ -148,8 +148,8 @@ class Client implements ClientContract
     {
         try {
             $data=array_filter($data, fn ($value) => $value );
-            if($data['location']){
-                $data['location'] = json_decode($data['location']);
+            if(array_key_exists('location',$data)){
+                $data['location'] = json_encode($data['location']);
             }
             $client = $data = supabase_instance()->initializeDatabase('clients', 's_id')->update($s_id,$data);
             $client =  (array)$client[0];

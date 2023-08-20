@@ -2,38 +2,49 @@
 
 use App\Models\Client;
 use App\Models\Driver;
-
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Http;
 
 
 if (!function_exists('generate_otp')) {
-    function generate_otp($phone_number,$model)
+    function generate_otp($phone_number)
     {
        
-        if($model == 'Client'){
-            $model_record = Client::whereDeletedAt(null)->firstOrCreate(['phone_number'=>$phone_number],array(['phone_number'=>$phone_number]));
-            //TODO: throw error if account is not yet accepted
-        }else{
-            //TODO: check if account is deleted
-            $model_record = Driver::whereDeletedAt(null)->firstOrCreate(['phone_number'=>$phone_number],array(['phone_number'=>$phone_number]));
+        $record = DB::table('otp_verifications')        
+        ->where('phone_number',$phone_number)
+        ->first();
+        if(!$record) {
+            DB::table('otp_verifications')
+                        ->insert(
+                            ['phone_number' => $phone_number]
+                        );
         }
-  
+
+       
+        $record = DB::table('otp_verifications')        
+        ->where('phone_number',$phone_number);
+
         $now = now();
-        if($model_record && isset($model_record->otp_verification_code) && $model_record->otp_expire_at && $now->isBefore($model_record->otp_expire_at)){
-            return $model_record->otp_verification_code;
+        if($auth = $record->first()) {
+            
+            if(!is_null($auth->otp_verification_code) && !is_null($auth->otp_expire_at) && $now->isBefore($auth->otp_expire_at)) {
+                return $auth->otp_verification_code;
+            }
+
+            $record->update([
+                'otp_verification_code' =>  rand(12345, 99999),
+                'otp_expire_at' =>  $now->addMinutes(10),
+
+            ]);
+
+            return $auth->otp_verification_code;
         }
-        
-        $model_record->otp_verification_code =  rand(12345, 99999);
-        $model_record->otp_expire_at =  $now->addMinutes(10);
-        $model_record->save();
-        
-        return $model_record->otp_verification_code;
 
     }
 }
 if(!function_exists('send_sms')){
 
-    function sendSMS($receiverNumber,$message,$content,$model)
+    function sendSMS($receiverNumber,$message,$content)
     {
         $message = $message.' '.$content;
     
