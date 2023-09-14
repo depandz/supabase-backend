@@ -6,21 +6,26 @@ use Exception;
 use Illuminate\Http\Request;
 use App\Contracts\ClientContract;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\ClientRegisterRequest;
+use App\Services\Locale\Client as ClientRepository;
 use App\Http\Requests\ClientUpdateRequest;
+use App\Models\Client;
 
 class ClientController extends Controller
 {
-        public $api_responser;
+     
 
         public $client_contract;
-
+        protected $repository;
         /**
          * @var ClientContract
+         * @var ClientRepository
          */
-        public function __construct(ClientContract $client_contract)
+        public function __construct(ClientContract $client_contract,ClientRepository $repository)
         {
             parent::__construct();
             $this->client_contract = $client_contract;
+            $this->repository = $repository;
         }
 
         public function index()
@@ -86,23 +91,49 @@ class ClientController extends Controller
         *         @OA\MediaType(
         *            mediaType="application/x-www-form-urlencoded",
         *             @OA\Schema(
-        *                 @OA\Property( property="full_name",type="string",example="full Name"),
+        *                 @OA\Property( property="first_name",type="string",example="first Name"),
+        *                 @OA\Property( property="last_name",type="string",example="last Name"),
         *                 @OA\Property(property="phone_number",type="string",example="+213664419425"),
+        *                 @OA\Property(property="email",type="string",example="email@email.com"),
+        *                 @OA\Property(property="gender",type="string",enum={"male","female"}),
         *             )),
         *    ),
         *    @OA\Response( response=200, description="Client registered successfully", @OA\JsonContent() ),
         *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
         *     )
         */
-        public function register(Request $request)
+        public function register(ClientRegisterRequest $request)
         {
             try {
-                $validated = $request->validate([
-                    'phone_number' => 'required|regex:/^\+213[567]\d{8}$/',
-                    'full_name' => 'required|string|max:140'
-                ]);
+                $clients = $this->client_contract->findBy('phone_number', ltrim($request['phone_number'],'+'));
+  
+                $client = firstOf($clients);
+                //unset unwanted data
+                $data =$request->validated();
+                // Remove 'first_name' and 'last_name' keys
+                $first_name = $data['first_name'];
+                $last_name = $data['last_name'];
+                unset($data['first_name'], $data['last_name']);
 
-                $client = $this->client_contract->insert($validated);
+                // Concatenate 'first_name' and 'last_name' into 'full_name'
+                $data['full_name'] = $first_name . ' ' . $last_name;
+                $data['phone_number'] = ltrim($data['phone_number'],'+');
+
+                if($client)
+                {
+                    if($client->account_status != 'active'){
+                                    return $this->api_responser
+                                        ->failed()
+                                        ->code(403)
+                                        ->message('Your Account is '.$clients[0]->account_status.' please contact the support team')
+                                        ->send();
+                    }
+                    $client = $this->client_contract->update($client->s_id,$data);
+                }
+                else
+                {
+                    $client = $this->client_contract->insert($data);
+                }
                 //TODO: send notification to admin
                 return $this->api_responser
                     ->success()
@@ -117,53 +148,63 @@ class ClientController extends Controller
                     ->message($ex->getMessage())
                     ->send();
             }
-    }
-        /**
-        * @OA\Post(
-        * path="/api/v1/clients/login",
-        * operationId="login_client",
-        * tags={"clients"},
-        * summary="login a client using phone number",
-        *     @OA\RequestBody(
-        *         @OA\JsonContent(),
-        *         @OA\MediaType(
-        *            mediaType="application/x-www-form-urlencoded",
-        *             @OA\Schema(
-        *                 @OA\Property(property="phone_number",type="string",example="+213664419425"),
-        *             )),
-        *    ),
-        *    @OA\Response( response=200, description="Client logged in successfully", @OA\JsonContent() ),
-        *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
-        *     )
-        */
-        public function login(Request $request)
-        {
-            try {
-                $validated = $request->validate([
-                    'phone_number' => 'required|regex:/^\+213[567]\d{8}$/',
-                ]);
-                $validated['phone_number'] = ltrim($validated['phone_number'], '+');
-        
-                $client = $this->client_contract->findBy('phone_number',$validated['phone_number']);
-
-                if($client)
-                {
-                return $this->api_responser
-                    ->success()
-                    ->message('Client logged in successfully')
-                    ->payload($client[0])
-                    ->send();
-                }
-
-            }
-            catch(Exception $ex){
-                
-                return $this->api_responser
-                    ->failed($ex->getCode())
-                    ->message($ex->getMessage())
-                    ->send();
-            }
         }
+    
+   
+        // /**
+        // * @OA\Post(
+        // * path="/api/v1/clients/login",
+        // * operationId="login_client",
+        // * tags={"clients"},
+        // * summary="login a client using phone number",
+        // *     @OA\RequestBody(
+        // *         @OA\JsonContent(),
+        // *         @OA\MediaType(
+        // *            mediaType="application/x-www-form-urlencoded",
+        // *             @OA\Schema(
+        // *                 @OA\Property(property="phone_number",type="string",example="+213664419425"),
+        // *             )),
+        // *    ),
+        // *    @OA\Response( response=200, description="Client logged in successfully", @OA\JsonContent() ),
+        // *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+        // *     )
+        // */
+        
+        // public function login(Request $request)
+        // {
+        //     try {
+        //         $validated = $request->validate([
+        //             'phone_number' => 'required|regex:/^\+213[567]\d{8}$/',
+        //         ]);
+        //         $validated['phone_number'] = ltrim($validated['phone_number'], '+');
+        
+        //         $clients = $this->client_contract->findBy('phone_number',$validated['phone_number']);
+
+        //         if($clients && count($clients))
+        //         {
+        //             if($clients[0]->account_status != 'active'){
+        //             return $this->api_responser
+        //                 ->failed()
+        //                 ->code(403)
+        //                 ->message('Your Account is '.$clients[0]->account_status.' please contact the support team')
+        //                 ->send();
+        //             }
+        //             return $this->api_responser
+        //                 ->success()
+        //                 ->message('Client logged in successfully')
+        //                 ->payload($clients[0])
+        //                 ->send();
+        //         }
+
+        //     }
+        //     catch(Exception $ex){
+                
+        //         return $this->api_responser
+        //             ->failed($ex->getCode())
+        //             ->message($ex->getMessage())
+        //             ->send();
+        //     }
+        // }
         /**
         * @OA\Put(
         * path="/api/v1/clients/{s_id}/update",

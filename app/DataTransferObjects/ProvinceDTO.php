@@ -8,7 +8,10 @@ class ProvinceDTO
 
     public function __construct(
         public ?int $code,
-        public ?string $name 
+        public ?string $name ,
+        public ?string $name_ar ,
+        public ?string $longitude ,
+        public ?string $latitude ,
     ){}
 
     //TODO: private properties

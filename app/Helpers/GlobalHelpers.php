@@ -1,6 +1,7 @@
 <?php
 
 use App\Enums\GlobalVars;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 
 if(!function_exists('generate_sid')){
@@ -19,6 +20,13 @@ if(!function_exists('generate_sid')){
             
         }
         return $prefix.'_'.explode('-',Str::uuid())[0];
+
+    }
+}
+if(!function_exists('firstOf')){
+    function firstOf(Collection $items){
+
+        return $items && count($items) ? $items[0] : null;
 
     }
 }

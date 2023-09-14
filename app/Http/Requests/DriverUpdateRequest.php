@@ -4,7 +4,7 @@ namespace App\Http\Requests;
 
 use Illuminate\Foundation\Http\FormRequest;
 
-class ClientUpdateRequest extends FormRequest
+class DriverUpdateRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -22,14 +22,12 @@ class ClientUpdateRequest extends FormRequest
     public function rules(): array
     {
         return [
-           'first_name' => 'sometimes|nullable|string|max:150',
-           'last_name' => 'sometimes|nullable|string|max:150',
-           'phone_number' => 'sometimes|nullable|string|max:150',
-           'gender' => 'sometimes|nullable|in:male,female',
-        //    'location' => 'sometimes|nullable|json',
+           'full_name' => 'sometimes|nullable|string|max:100',
+           'phone_number' => 'sometimes|nullable|string|max:100',
+           'location' => 'sometimes|nullable|json',
            'email' => 'sometimes|nullable|string|max:100',
-        //    'photo' => 'sometimes|nullable|string|image|mimes:jpg,jpeg,webp,bmp,png,gif,svg',
-           'messaging_token' => 'sometimes|nullable|string|max:100',
+            'messaging_token' => 'sometimes|nullable|string|max:100',
+           'is_online' => 'sometimes|in:0,1',
         ];
     }
 }
