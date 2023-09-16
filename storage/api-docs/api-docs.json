@@ -578,6 +578,75 @@
                 }
             }
         },
+        "/api/v1/pickup-requests/initialize": {
+            "post": {
+                "tags": [
+                    "pickup_requests"
+                ],
+                "summary": "initialize pickup request ",
+                "operationId": "initialize_pickup_request",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "client_sid": {
+                                        "type": "string"
+                                    },
+                                    "current_province_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "location": {
+                                        "type": "string"
+                                    },
+                                    "destination": {
+                                        "type": "string"
+                                    },
+                                    "licence_plate": {
+                                        "type": "string",
+                                        "example": "1457854897"
+                                    },
+                                    "is_vehicle_empty": {
+                                        "type": "boolean",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
+                                    },
+                                    "date_requested": {
+                                        "type": "string",
+                                        "format": "date"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pickup request initialized successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/provinces/": {
             "get": {
                 "tags": [

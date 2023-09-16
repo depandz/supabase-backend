@@ -3,6 +3,9 @@ models:
         id: id
         name: string unique
         code: smallInteger unique
+        ar_name: string unique
+        longitude: string unique
+        latitude: string unique
     Client:
         id: id
         s_id: string unique
