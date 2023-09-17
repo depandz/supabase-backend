@@ -33,7 +33,7 @@ class ProvinceDataFetcher
             return $next($data);
         }
         catch(Exception $ex){
-            handleTwoCommunErrors($ex);
+           throw $ex;
         }
     }
 }

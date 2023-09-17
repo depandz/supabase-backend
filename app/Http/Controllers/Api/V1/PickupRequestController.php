@@ -2,13 +2,14 @@
 
 namespace App\Http\Controllers\Api\V1;
 
-use App\Contracts\PickUpRequestContract;
 use Illuminate\Http\Request;
-use Illuminate\Pipeline\Pipeline;
-use App\Http\Controllers\Controller;
-use App\Http\Requests\InitializePickupRequest;
 use App\Pipes\FetchDriversList;
+use Illuminate\Pipeline\Pipeline;
 use App\Pipes\ProvinceDataFetcher;
+use App\Http\Controllers\Controller;
+use App\Contracts\PickUpRequestContract;
+use App\Http\Requests\InitializePickupRequest;
+use App\Pipes\DriversDistanceFromClientCalculator;
 
 class PickupRequestController extends Controller
 {
@@ -33,10 +34,10 @@ class PickupRequestController extends Controller
         *         @OA\MediaType(
         *            mediaType="application/x-www-form-urlencoded",
         *             @OA\Schema(
-        *                 @OA\Property( property="client_sid",type="string"),
+        *                 @OA\Property( property="client_sid",type="string",example="cls_257841"),
         *                 @OA\Property(property="current_province_id",type="integer",example="1"),
-        *                 @OA\Property( property="location",type="string"),
-        *                 @OA\Property(property="destination",type="string"),
+        *                 @OA\Property( property="location",type="json",example={"lat":27.895505,"lng":-0.2931788}),
+        *                 @OA\Property(property="destination",type="json",example={"lat":27.895505,"lng":-0.2931788}),
         *                 @OA\Property(property="licence_plate",type="string",example="1457854897"),
         *                 @OA\Property(property="is_vehicle_empty",type="boolean",enum={0,1}),
         *                 @OA\Property(property="date_requested",type="date"),
@@ -53,7 +54,8 @@ class PickupRequestController extends Controller
         ->send((array)$data)
         ->through([
             ProvinceDataFetcher::class,
-            FetchDriversList::class
+            FetchDriversList::class,
+            DriversDistanceFromClientCalculator::class
         ])
         ->thenReturn();
         // ->then(function (array $data) {

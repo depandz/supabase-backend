@@ -591,17 +591,26 @@
                             "schema": {
                                 "properties": {
                                     "client_sid": {
-                                        "type": "string"
+                                        "type": "string",
+                                        "example": "cls_257841"
                                     },
                                     "current_province_id": {
                                         "type": "integer",
                                         "example": "1"
                                     },
                                     "location": {
-                                        "type": "string"
+                                        "type": "json",
+                                        "example": {
+                                            "lat": 27.895505,
+                                            "lng": -0.2931788
+                                        }
                                     },
                                     "destination": {
-                                        "type": "string"
+                                        "type": "json",
+                                        "example": {
+                                            "lat": 27.895505,
+                                            "lng": -0.2931788
+                                        }
                                     },
                                     "licence_plate": {
                                         "type": "string",

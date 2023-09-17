@@ -6,7 +6,7 @@ use App\Contracts\DriverContract;
 use Closure;
 use Exception;
 
-class FetchDriversList
+class PickupPriceCalculator
 {
 
 

@@ -8,12 +8,12 @@ class PositionDTO
 {
 
     public function __construct(
-        public ?string $place_id,
-        public ?string $zip,
-        public ?string $city,
-        public ?string $search_string,
-        public ?float $lat,
-        public ?float $lng,
+        public ?string $place_id=null,
+        public ?string $zip=null,
+        public ?string $city=null,
+        public ?string $search_string=null,
+        public ?float $lat=null,
+        public ?float $lng=null,
     ){}
 
 
