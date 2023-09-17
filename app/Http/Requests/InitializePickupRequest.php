@@ -29,7 +29,9 @@ class InitializePickupRequest extends FormRequest
             'destination'=>'required|string',
             'licence_plate'=>'required|string',
             'is_vehicle_empty'=>'required|boolean',
-            'date_requested'=>'sometimes|nullable|date'
+            'date_requested'=>'sometimes|nullable|date',
+            'distance'=>'required|numeric',
+            'duration'=>'required|numeric'
         ];
     }
 }

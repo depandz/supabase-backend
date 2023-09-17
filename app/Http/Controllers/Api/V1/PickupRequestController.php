@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Contracts\PickUpRequestContract;
 use App\Http\Requests\InitializePickupRequest;
 use App\Pipes\DriversDistanceFromClientCalculator;
+use App\Pipes\PickupPriceCalculator;
 
 class PickupRequestController extends Controller
 {
@@ -38,9 +39,11 @@ class PickupRequestController extends Controller
         *                 @OA\Property(property="current_province_id",type="integer",example="1"),
         *                 @OA\Property( property="location",type="json",example={"lat":27.895505,"lng":-0.2931788}),
         *                 @OA\Property(property="destination",type="json",example={"lat":27.895505,"lng":-0.2931788}),
+        *                 @OA\Property(property="distance",type="float",example="3"),
+        *                 @OA\Property(property="duration",type="float",example="20"),
         *                 @OA\Property(property="licence_plate",type="string",example="1457854897"),
         *                 @OA\Property(property="is_vehicle_empty",type="boolean",enum={0,1}),
-        *                 @OA\Property(property="date_requested",type="date"),
+        *                 @OA\Property(property="date_requested",type="date",example="17-09-2023 15:22"),
         *             )),
         *    ),
         *    @OA\Response( response=200, description="Pickup request initialized successfully", @OA\JsonContent() ),
@@ -55,7 +58,8 @@ class PickupRequestController extends Controller
         ->through([
             ProvinceDataFetcher::class,
             FetchDriversList::class,
-            DriversDistanceFromClientCalculator::class
+            DriversDistanceFromClientCalculator::class,
+            PickupPriceCalculator::class
         ])
         ->thenReturn();
         // ->then(function (array $data) {

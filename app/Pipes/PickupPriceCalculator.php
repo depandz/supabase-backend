@@ -3,7 +3,9 @@
 namespace App\Pipes;
 
 use App\Contracts\DriverContract;
+use App\Enums\VehicleTypes;
 use Closure;
+use DateTime;
 use Exception;
 
 class PickupPriceCalculator
@@ -23,12 +25,29 @@ class PickupPriceCalculator
     public function handle(array $data, Closure $next)
     {
         try {
-            $drivers = $this->driver_contract->findByProvince($data['current_province_id']);
-            $data['available_drivers'] = $drivers;
+            $distance_in_km = $data['distance'];
+            $is_vehicle_empty = $data['is_vehicle_empty'];
+            $vehicle_type_fee = $this->getVehicleFee($data['province_fee']);
+
+            $base_price = $distance_in_km * $vehicle_type_fee;
+            if (isEightPM($data['date_requested'])) {
+                $base_price = $distance_in_km * ($vehicle_type_fee + env('NIGHT_TARIFF'));
+            }
+
+            if (!(bool)$is_vehicle_empty) {
+                $data['estimated_price'] = round($base_price + $data['province_fee']->full_percentage);
+            }else 
+            {
+                $data['estimated_price'] = round($base_price);
+            }
             return $next($data);
         }
         catch(Exception $ex){
             throw $ex;
         }
+    }
+    public function getVehicleFee(object $province_fee,string $vehicle_type="light"){
+        if(!$province_fee) return env('DEFAULT_KILOMETER_PRICE');
+        return $province_fee->asArray()[$vehicle_type];
     }
 }

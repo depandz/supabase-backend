@@ -612,6 +612,16 @@
                                             "lng": -0.2931788
                                         }
                                     },
+                                    "distance": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": "3"
+                                    },
+                                    "duration": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": "20"
+                                    },
                                     "licence_plate": {
                                         "type": "string",
                                         "example": "1457854897"
