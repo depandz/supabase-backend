@@ -2,11 +2,11 @@
 
 namespace App\Enums;
 
-class PickupRequestStatus
+enum  PickupRequestStatus:string
 {
-    public static $INITIALIZED = 0;
-    public static $PENDING = 1;
-    public static $APPROVED = 1;
-    public static $CANCELED = 3;
-    public static $VALIDATED = 4;
+   case INITIALIZED = 'initialized';
+   case PENDING =  'pending';
+   case APPROVED = 'approved';
+   case CANCELED = 'canceled';
+   case VALIDATED = 'validated';
 }

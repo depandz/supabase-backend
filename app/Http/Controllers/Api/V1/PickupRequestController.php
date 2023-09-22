@@ -2,15 +2,22 @@
 
 namespace App\Http\Controllers\Api\V1;
 
+use DateTime;
+use App\Enums\VehicleTypes;
 use Illuminate\Http\Request;
 use App\Pipes\FetchDriversList;
+use App\Contracts\ClientContract;
 use Illuminate\Pipeline\Pipeline;
+use App\Enums\PickupRequestStatus;
 use App\Pipes\ProvinceDataFetcher;
 use App\Http\Controllers\Controller;
+use App\Pipes\PickupPriceCalculator;
+use Illuminate\Support\Facades\Date;
 use App\Contracts\PickUpRequestContract;
+use App\DataTransferObjects\PositionDTO;
 use App\Http\Requests\InitializePickupRequest;
 use App\Pipes\DriversDistanceFromClientCalculator;
-use App\Pipes\PickupPriceCalculator;
+use App\DataTransferObjects\PickupRequestDTO as PickupRequestObject;
 
 class PickupRequestController extends Controller
 {
@@ -35,7 +42,7 @@ class PickupRequestController extends Controller
         *         @OA\MediaType(
         *            mediaType="application/x-www-form-urlencoded",
         *             @OA\Schema(
-        *                 @OA\Property( property="client_sid",type="string",example="cls_257841"),
+        *                 @OA\Property( property="client_id",type="integer",example="1"),
         *                 @OA\Property(property="current_province_id",type="integer",example="1"),
         *                 @OA\Property( property="location",type="json",example={"lat":27.895505,"lng":-0.2931788}),
         *                 @OA\Property(property="destination",type="json",example={"lat":27.895505,"lng":-0.2931788}),
@@ -43,6 +50,7 @@ class PickupRequestController extends Controller
         *                 @OA\Property(property="duration",type="float",example="20"),
         *                 @OA\Property(property="licence_plate",type="string",example="1457854897"),
         *                 @OA\Property(property="is_vehicle_empty",type="boolean",enum={0,1}),
+        *                 @OA\Property(property="vehicle_type",type="string",enum={"light","heavy","truck"}),
         *                 @OA\Property(property="date_requested",type="date",example="17-09-2023 15:22"),
         *             )),
         *    ),
@@ -61,19 +69,68 @@ class PickupRequestController extends Controller
             DriversDistanceFromClientCalculator::class,
             PickupPriceCalculator::class
         ])
-        ->thenReturn();
-        // ->then(function (array $data) {
-        //     return $this->api_responser
-        //     ->success()
-        //     ->message('Pickup request initialized successfully')
-        //     ->payload($data)
-        //     ->send();
-        // });
+        // ->thenReturn();
+        ->then(function (array $data) {
+            $pickup_request = $this->store($data);
+            return $this->api_responser
+            ->success()
+            ->message('Pickup request initialized successfully')
+            ->payload(
+                [
+                    'pickup_request'=>$pickup_request,
+                    'drivers'=>collect($data['available_drivers'])->map(function($driver){
+                        return [
+                            "s_id"=>$driver->s_id,
+                            "full_name"=>$driver->full_name,
+                            "phone_number"=>$driver->phone_number,
+                            "location"=>$driver->location,
+                            "photo"=>$driver->photo,
+                            "reported_count"=>$driver->reported_count,
+                            "capacity"=>$driver->capacity
+                        ];
+                    })
+                ]
+            )
+            ->send();
+        });
         return $this->api_responser
             ->success()
             ->message('Pickup request initialized successfully')
             ->payload($result)
             ->send();
        
+    }
+    public function store(array $data)
+    {
+        try{
+            // $clients =(new ClientContract())->findBy('s_id',$data['client_sid'] );
+            // $client = firstOf($clients);
+
+            $pickup_request = new PickupRequestObject(
+                s_id:null,
+                client_id:$data['client_id'],
+                driver_id:null,
+                location:new PositionDTO(lat: json_decode($data['location'])->lat,lng:json_decode($data['location'])->lng),
+                destination:new PositionDTO(lat: json_decode($data['location'])->lat,lng:json_decode($data['location'])->lng),
+                estimated_distance:$data['distance'],
+                estimated_price:$data['estimated_price'],
+                estimated_duration:$data['duration'],
+                vehicle_type:$data['vehicle_type'] ?? VehicleTypes::LIGHT->value,
+                is_vehicle_empty:$data['is_vehicle_empty'],
+                vehicle_licence_plate:$data['licence_plate'],
+                date_requested:Date::createFromTimeString($data['date_requested']),
+                status:PickupRequestStatus::INITIALIZED->value,
+             );
+           
+           $pickup_initialized = $this->pickup_request_contract->insert($pickup_request->asArray());
+           return $pickup_initialized;
+        }
+        catch(\Exception $ex)
+        {
+            return $this->api_responser
+            ->failed()
+            ->message('Error when initalize pickup request '.$ex->getMessage())
+            ->send();
+        }
     }
 }

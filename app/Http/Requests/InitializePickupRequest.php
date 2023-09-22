@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests;
 
+use App\Enums\PickupRequestStatus;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InitializePickupRequest extends FormRequest
@@ -23,12 +24,13 @@ class InitializePickupRequest extends FormRequest
     {
 
         return [
-            'client_sid'=>'required|string',
+            'client_id'=>'required|integer',
             'location'=>'required|string',
             'current_province_id'=>'required|integer',
             'destination'=>'required|string',
             'licence_plate'=>'required|string',
-            'is_vehicle_empty'=>'required|boolean',
+            'is_vehicle_empty'=>'required|boolean|in:0,1',
+            'vehicle_type'=>'nullable|boolean|in:'.implode(',', array_column(PickupRequestStatus::cases(), 'value')),
             'date_requested'=>'sometimes|nullable|date',
             'distance'=>'required|numeric',
             'duration'=>'required|numeric'

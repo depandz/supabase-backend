@@ -27,7 +27,7 @@ class PickupPriceCalculator
         try {
             $distance_in_km = $data['distance'];
             $is_vehicle_empty = $data['is_vehicle_empty'];
-            $vehicle_type_fee = $this->getVehicleFee($data['province_fee']);
+            $vehicle_type_fee = $this->getVehicleFee($data['province_fee'],$data['vehicle_type'] ?? VehicleTypes::LIGHT->value);
 
             $base_price = $distance_in_km * $vehicle_type_fee;
             if (isEightPM($data['date_requested'])) {
@@ -46,7 +46,7 @@ class PickupPriceCalculator
             throw $ex;
         }
     }
-    public function getVehicleFee(object $province_fee,string $vehicle_type="light"){
+    public function getVehicleFee(object $province_fee,string $vehicle_type){
         if(!$province_fee) return env('DEFAULT_KILOMETER_PRICE');
         return $province_fee->asArray()[$vehicle_type];
     }

@@ -2,11 +2,11 @@
 
 namespace App\Enums;
 
-class VehicleTypes
+enum VehicleTypes:string
 {
-    public static $LIGHT = 'light';
+    case LIGHT = 'light';
 
-    public static $HEAVY = 'heavy';
+    case HEAVY = 'heavy';
 
-    public static $TRUCK = 'truck';
+    case TRUCK = 'truck';
 }
