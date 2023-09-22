@@ -202,7 +202,8 @@ class PickupRequest implements PickupRequestContract
             ]
         ];
         $pickup_requests = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
-            ->map(function($pickup_request){
+            ->map(function($pickup_request){    
+                
                 $pickup_request = (array) $pickup_request;
                 $location = $this->constructPosition($pickup_request['location']);
                 $destination = $this->constructPosition($pickup_request['destination']);
