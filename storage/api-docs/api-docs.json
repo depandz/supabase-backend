@@ -618,9 +618,8 @@
                                         "example": "3"
                                     },
                                     "duration": {
-                                        "type": "number",
-                                        "format": "float",
-                                        "example": "20"
+                                        "type": "string",
+                                        "example": "20:00"
                                     },
                                     "licence_plate": {
                                         "type": "string",
