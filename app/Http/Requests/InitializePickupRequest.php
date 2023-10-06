@@ -33,7 +33,7 @@ class InitializePickupRequest extends FormRequest
             'vehicle_type'=>'nullable|boolean|in:'.implode(',', array_column(PickupRequestStatus::cases(), 'value')),
             'date_requested'=>'sometimes|nullable|date',
             'distance'=>'required|numeric',
-            'duration'=>'required|numeric'
+            'duration'=>'required|string'
         ];
     }
 }

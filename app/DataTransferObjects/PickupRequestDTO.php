@@ -19,7 +19,7 @@ class PickupRequestDTO
         public ?Position $destination=null,
         public ?float $estimated_distance=null,
         public ?int $estimated_price=null,
-        public ?int $estimated_duration=null,
+        public ?string $estimated_duration=null,
         public ?string $vehicle_type,
         public ?bool $is_vehicle_empty=null,
         public ?string $vehicle_licence_plate=null,

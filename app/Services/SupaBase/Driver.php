@@ -115,7 +115,7 @@ class Driver implements DriverContract
             $drivers = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                     dd($item);
+                                   
                                         $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                                         return new DriverObject(
                                             $item['s_id'],
