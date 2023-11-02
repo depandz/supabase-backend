@@ -6,7 +6,6 @@ use DateTime;
 use App\Enums\VehicleTypes;
 use Illuminate\Http\Request;
 use App\Pipes\FetchDriversList;
-use App\Contracts\ClientContract;
 use Illuminate\Pipeline\Pipeline;
 use App\Enums\PickupRequestStatus;
 use App\Pipes\ProvinceDataFetcher;
@@ -42,7 +41,7 @@ class PickupRequestController extends Controller
         *         @OA\MediaType(
         *            mediaType="application/x-www-form-urlencoded",
         *             @OA\Schema(
-        *                 @OA\Property( property="client_id",type="integer",example="1"),
+        *                 @OA\Property( property="client_id",type="integer",example="9"),
         *                 @OA\Property(property="current_province_id",type="integer",example="1"),
         *                 @OA\Property( property="location",type="json",example={"lat":27.895505,"lng":-0.2931788}),
         *                 @OA\Property(property="destination",type="json",example={"lat":27.895505,"lng":-0.2931788}),
@@ -55,12 +54,15 @@ class PickupRequestController extends Controller
         *             )),
         *    ),
         *    @OA\Response( response=200, description="Pickup request initialized successfully", @OA\JsonContent() ),
+        *    @OA\Response( response=404, description="No client exists with the given id", @OA\JsonContent() ),
         *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
         *     )
         */
-    public function initialize(Request $request)
+    public function initialize(InitializePickupRequest $request)
     { 
         $data =$request->all();
+        //check client exists
+        $client = checkClientExists($request->client_id);
         $result= $this->pipeline
         ->send((array)$data)
         ->through([
@@ -72,23 +74,23 @@ class PickupRequestController extends Controller
         // ->thenReturn();
         ->then(function (array $data) {
             $pickup_request = $this->store($data);
+            $pickup_request->drivers =collect($data['available_drivers'])->map(function($driver){
+                return [
+                    "s_id"=>$driver->s_id,
+                    "full_name"=>$driver->full_name,
+                    "phone_number"=>$driver->phone_number,
+                    "location"=>$driver->location,
+                    "photo"=>$driver->photo,
+                    "reported_count"=>$driver->reported_count,
+                    "capacity"=>$driver->capacity
+                ];
+            });
             return $this->api_responser
             ->success()
             ->message('Pickup request initialized successfully')
             ->payload(
                 [
                     'pickup_request'=>$pickup_request,
-                    'drivers'=>collect($data['available_drivers'])->map(function($driver){
-                        return [
-                            "s_id"=>$driver->s_id,
-                            "full_name"=>$driver->full_name,
-                            "phone_number"=>$driver->phone_number,
-                            "location"=>$driver->location,
-                            "photo"=>$driver->photo,
-                            "reported_count"=>$driver->reported_count,
-                            "capacity"=>$driver->capacity
-                        ];
-                    })
                 ]
             )
             ->send();
@@ -103,9 +105,7 @@ class PickupRequestController extends Controller
     public function store(array $data)
     {
         try{
-            // $clients =(new ClientContract())->findBy('s_id',$data['client_sid'] );
-            // $client = firstOf($clients);
-
+          
             $pickup_request = new PickupRequestObject(
                 s_id:null,
                 client_id:$data['client_id'],
@@ -133,4 +133,5 @@ class PickupRequestController extends Controller
             ->send();
         }
     }
+   
 }

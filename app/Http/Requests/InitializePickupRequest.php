@@ -2,7 +2,7 @@
 
 namespace App\Http\Requests;
 
-use App\Enums\PickupRequestStatus;
+use App\Enums\VehicleTypes;
 use Illuminate\Foundation\Http\FormRequest;
 
 class InitializePickupRequest extends FormRequest
@@ -29,8 +29,8 @@ class InitializePickupRequest extends FormRequest
             'current_province_id'=>'required|integer',
             'destination'=>'required|string',
             'licence_plate'=>'required|string',
-            'is_vehicle_empty'=>'required|boolean|in:0,1',
-            'vehicle_type'=>'nullable|boolean|in:'.implode(',', array_column(PickupRequestStatus::cases(), 'value')),
+            'is_vehicle_empty'=>'required|in:0,1',
+            'vehicle_type'=>'nullable|in:'.implode(',', array_column(VehicleTypes::cases(), 'value')),
             'date_requested'=>'sometimes|nullable|date',
             'distance'=>'required|numeric',
             'duration'=>'required|string'

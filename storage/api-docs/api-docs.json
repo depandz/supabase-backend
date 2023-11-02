@@ -592,7 +592,7 @@
                                 "properties": {
                                     "client_id": {
                                         "type": "integer",
-                                        "example": "1"
+                                        "example": "9"
                                     },
                                     "current_province_id": {
                                         "type": "integer",
@@ -657,6 +657,14 @@
                 "responses": {
                     "200": {
                         "description": "Pickup request initialized successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No client exists with the given id",
                         "content": {
                             "application/json": {
                                 "schema": {}

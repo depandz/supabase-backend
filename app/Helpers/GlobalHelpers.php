@@ -2,6 +2,9 @@
 
 use App\Enums\GlobalVars;
 use Illuminate\Support\Str;
+use App\Helpers\ApiResponser;
+use App\Contracts\ClientContract;
+use App\Services\SupaBase\Client;
 use Illuminate\Support\Collection;
 
 if(!function_exists('generate_sid')){
@@ -40,4 +43,20 @@ if(!function_exists('isEightPM')){
         return $date_requested >= $desiredTime;
 
     }
+}
+/**
+ * check if a client exists by id 
+ */
+if(!function_exists('checkClient')){
+    function checkClientExists($client_id){
+        $client = (new Client())->findBy('id', $client_id);
+        if(!firstOf($client)) {
+              return  (new ApiResponser())
+                        ->failed()
+                        ->message('No Client exists with the given id')
+                        ->send();
+        } 
+        return true;
+    }
+  
 }
