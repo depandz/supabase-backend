@@ -578,6 +578,110 @@
                 }
             }
         },
+        "/api/v1/pickup-requests/initialize": {
+            "post": {
+                "tags": [
+                    "pickup_requests"
+                ],
+                "summary": "initialize pickup request ",
+                "operationId": "initialize_pickup_request",
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "client_id": {
+                                        "type": "integer",
+                                        "example": "9"
+                                    },
+                                    "current_province_id": {
+                                        "type": "integer",
+                                        "example": "1"
+                                    },
+                                    "location": {
+                                        "type": "json",
+                                        "example": {
+                                            "lat": 27.895505,
+                                            "lng": -0.2931788
+                                        }
+                                    },
+                                    "destination": {
+                                        "type": "json",
+                                        "example": {
+                                            "lat": 27.895505,
+                                            "lng": -0.2931788
+                                        }
+                                    },
+                                    "distance": {
+                                        "type": "number",
+                                        "format": "float",
+                                        "example": "3"
+                                    },
+                                    "duration": {
+                                        "type": "string",
+                                        "example": "20:00"
+                                    },
+                                    "licence_plate": {
+                                        "type": "string",
+                                        "example": "1457854897"
+                                    },
+                                    "is_vehicle_empty": {
+                                        "type": "boolean",
+                                        "enum": [
+                                            0,
+                                            1
+                                        ]
+                                    },
+                                    "vehicle_type": {
+                                        "type": "string",
+                                        "enum": [
+                                            "light",
+                                            "heavy",
+                                            "truck"
+                                        ]
+                                    },
+                                    "date_requested": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "17-09-2023 15:22"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pickup request initialized successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No client exists with the given id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/provinces/": {
             "get": {
                 "tags": [

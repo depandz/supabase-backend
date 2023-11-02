@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\DriverController;
 use App\Http\Controllers\Api\V1\ProvinceController;
+use App\Http\Controllers\Api\V1\PickupRequestController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -40,5 +41,8 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::post('/login','login');
         Route::get('{s_id}','show');
         Route::put('{s_id}/update','update');
+    });
+    Route::controller(PickupRequestController::class)->prefix('pickup-requests')->group(function(){
+        Route::post('/initialize','initialize');
     });
 });

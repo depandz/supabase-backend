@@ -4,6 +4,7 @@ namespace App\Contracts;
 
 use Illuminate\Http\File;
 use App\DataTransferObjects\DriverDTO as DriverObject;
+use Illuminate\Support\Collection;
 
 interface DriverContract extends SupaBaseContract
 {
@@ -16,4 +17,6 @@ interface DriverContract extends SupaBaseContract
     public function suspend(int $id): void;
 
     public function activateAccount(int $id): void;
+
+    public function findByProvince(int $province_id): Collection;
 }

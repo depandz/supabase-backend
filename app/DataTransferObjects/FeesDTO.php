@@ -13,6 +13,13 @@ class FeesDTO
         public ?float $truck,
         public ?int $full_percentage,
     ){}
-
+    public function asArray(){
+        return [
+            'province_id'=>$this->province_id,
+            'heavy'=>$this->heavy,
+            'light'=>$this->light,
+            'truck'=>$this->truck,
+        ];
+    }
 
 }

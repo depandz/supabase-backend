@@ -52,6 +52,48 @@ class Driver implements DriverContract
 
         return $drivers;
     }
+    public function findByProvince(int $province_id): Collection
+    {         
+        $query = [
+            'select' => '*',
+            'from'   => 'drivers',
+            'where' => 
+            [
+                'province_id' => 'eq.'.$province_id,
+                'is_online' => 'eq.'.true,
+                'reported_count' => 'lt.3',
+                'account_status' => 'eq.active',
+            ]
+        ];
+        $drivers = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
+            ->map(function ($item) {
+                $item =(array)$item;
+                $item['company'] = isset($item['companies']) ? $item['companies'] : null;
+                return new DriverObject(
+                    $item['s_id'],
+                    $item['full_name'],
+                    $item['phone_number'],
+                    $item['gender'],
+                    $item['location'],
+                    $item['email'],
+                    $item['photo'],
+                    $item['messaging_token'],
+                    $item['reported_count'],
+                    $item['account_status'],
+                    $item['registered_at'],
+                    $item['vehicle_type'],
+                    $item['identity_card_number'],
+                    $item['commercial_register_number'],
+                    $item['capacity'],
+                    $item['licence_plate'],
+                    $item['is_online'],
+                    $item['company'],
+                    $item['can_transport_goods'],
+                );
+        });
+
+        return $drivers;
+    }
     public function findBy($column, $value): Collection
     {
          
@@ -73,7 +115,7 @@ class Driver implements DriverContract
             $drivers = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                     dd($item);
+                                   
                                         $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                                         return new DriverObject(
                                             $item['s_id'],

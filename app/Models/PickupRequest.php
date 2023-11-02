@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Enums\PickupRequestStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -50,8 +51,8 @@ class PickupRequest extends Model
         'is_vehicle_empty' => 'boolean',
         'vehicle_licence_plate' => 'integer',
         'updated_at' => 'datetime',
+        'status' => PickupRequestStatus::class
     ];
-
     public function client(): BelongsTo
     {
         return $this->belongsTo(Client::class);

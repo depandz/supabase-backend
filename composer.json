@@ -33,7 +33,8 @@
             "App\\Contracts\\": "Contracts",
             "App\\DataTransferObjects\\": "DataTransferObjects",
             "App\\Helpers\\": "Helpers",
-            "App\\Enums\\": "Enums"
+            "App\\Enums\\": "Enums",
+            "App\\Pipes\\": "Pipes"
         },
         "files": [
             "app/Helpers/Authentication.php",

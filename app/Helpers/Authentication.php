@@ -9,7 +9,7 @@ use Illuminate\Support\Facades\Http;
 if (!function_exists('generate_otp')) {
     function generate_otp($phone_number)
     {
-       
+                
         $record = DB::table('otp_verifications')        
         ->where('phone_number',$phone_number)
         ->first();
@@ -37,7 +37,8 @@ if (!function_exists('generate_otp')) {
 
             ]);
 
-            return $auth->otp_verification_code;
+            return $record->first()->otp_verification_code;
+
         }
 
     }
