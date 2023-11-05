@@ -44,5 +44,6 @@ Route::group(['as' => 'api_v1.'], function () {
     });
     Route::controller(PickupRequestController::class)->prefix('pickup-requests')->group(function(){
         Route::post('/initialize','initialize');
+        Route::post('/{s_id}/confirm','confirm');
     });
 });

@@ -6,6 +6,7 @@ use DateTime;
 use App\Enums\VehicleTypes;
 use App\Enums\PickupRequestStatus;
 use App\DataTransferObjects\PositionDTO as Position;
+use App\DataTransferObjects\DriverDTO as Driver;
 use Illuminate\Support\Facades\Date;
 
 class PickupRequestDTO
@@ -25,6 +26,7 @@ class PickupRequestDTO
         public ?string $vehicle_licence_plate=null,
         public $date_requested=null,
         public ?string $status=null,
+        public $drivers=null,
     ){}
     public function asArray(){
         return  (array) $this;

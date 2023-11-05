@@ -682,6 +682,68 @@
                 }
             }
         },
+        "/api/v1/pickup-requests/{s_id}/confirm": {
+            "post": {
+                "tags": [
+                    "pickup_requests"
+                ],
+                "summary": "confirm pickup request ",
+                "operationId": "confirm_pickup_request",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "Pickup request secret id ",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "date_confirmed": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "17-09-2023 15:22"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pickup request confirmed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No pickup request exists with the given id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/provinces/": {
             "get": {
                 "tags": [
