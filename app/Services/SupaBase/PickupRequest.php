@@ -5,6 +5,7 @@ namespace App\Services\SupaBase;
 use DateTime;
 use Exception;
 use App\Contracts\PickupRequestContract;
+use App\DataTransferObjects\DriverDTO as Driver;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use App\DataTransferObjects\PickupRequestDTO as PickpRequestObject;
@@ -233,11 +234,19 @@ class PickupRequest implements PickupRequestContract
             });
         return firstOf($pickup_requests);
     }
-    public function confirm(string $s_id, $date_confirmed): PickpRequestObject
+    public function confirm(string $s_id, $date_confirmed): PickpRequestObject | null
     {
         $data =[
             'updated_at' => Date::createFromTimeString($date_confirmed),
             'status'=> PickupRequestStatus::PENDING->value
+        ];
+        return $this->update($s_id,$data);
+    }
+    public function approve(string $s_id, int $driver_id): PickpRequestObject | null
+    {
+        $data =[
+            'driver_id' => $driver_id,
+            'status'=> PickupRequestStatus::APPROVED->value
         ];
         return $this->update($s_id,$data);
     }

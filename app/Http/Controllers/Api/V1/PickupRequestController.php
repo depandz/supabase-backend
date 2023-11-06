@@ -49,7 +49,7 @@ class PickupRequestController extends Controller
      *                 @OA\Property( property="location",type="json",example={"lat":27.895505,"lng":-0.2931788}),
      *                 @OA\Property(property="destination",type="json",example={"lat":27.895505,"lng":-0.2931788}),
      *                 @OA\Property(property="distance",type="float",example="3"),
-     *                 @OA\Property(property="duration",type="string",example="20:00"),
+     *                 @OA\Property(property="duration",type="string",example="20 min"),
      *                 @OA\Property(property="licence_plate",type="string",example="1457854897"),
      *                 @OA\Property(property="is_vehicle_empty",type="boolean",enum={0,1}),
      *                 @OA\Property(property="vehicle_type",type="string",enum={"light","heavy","truck"}),
@@ -171,6 +171,7 @@ class PickupRequestController extends Controller
             $s_id,  Date::createFromTimeString($request->date_confirmed)
         );
         $driver =json_decode($pickup_request->drivers,true)[0];
+    
         event(new StartPickupRequestCalling($pickup_request,$driver));
         return $this->api_responser
             ->success()

@@ -14,4 +14,6 @@ interface PickUpRequestContract extends SupaBaseContract
     public function checkExist(int $client_id, int $distance): PickupRequest|null;
 
     public function confirm(string $s_id, $date_confirmed): PickupRequest|null;
+    
+    public function approve(string $s_id, int $driver): PickupRequest|null;
 }

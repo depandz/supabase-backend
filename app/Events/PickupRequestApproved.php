@@ -10,9 +10,10 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class StartPickupRequestCalling implements ShouldBroadcast 
+class PickupRequestApproved implements ShouldBroadcast 
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
+
 
     /**
      * Create a new event instance.
@@ -29,10 +30,10 @@ class StartPickupRequestCalling implements ShouldBroadcast
     {
       
         return [
-            new PrivateChannel('pickup_request.'.$this->driver['s_id'])
+            new PrivateChannel('pickup_request.'.$this->pickup->s_id)
         ];
     }
-    /**
+   /**
      * Get the data to broadcast.
      *
      * @return array<string, mixed>
@@ -47,6 +48,14 @@ class StartPickupRequestCalling implements ShouldBroadcast
                     'destination'=>$this->pickup->destination,
                     'estimated_price'=>$this->pickup->estimated_price,
                     'estimated_duration'=>$this->pickup->estimated_duration,
+                    'driver'=>
+                    [
+                        's_id'=>$this->driver['s_id'],
+                        'full_name'=>$this->driver['full_name'],
+                        'phone_number'=>$this->driver['phone_number'],
+                        'location'=>$this->driver['location'],
+                        'photo'=>url('storage/drivers/photos/'.$this->driver['photo']),
+                    ]
             ]
             ];
     }

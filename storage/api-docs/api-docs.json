@@ -578,6 +578,85 @@
                 }
             }
         },
+        "/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/{action}": {
+            "post": {
+                "tags": [
+                    "drivers"
+                ],
+                "summary": "accept or decline pickup request",
+                "operationId": "accept_or_decline_pickup_request",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "driver secret id ",
+                        "required": true
+                    },
+                    {
+                        "name": "pickup_sid",
+                        "in": "path",
+                        "description": "pickup secret id ",
+                        "required": true
+                    },
+                    {
+                        "name": "action",
+                        "in": "path",
+                        "description": "accept / decline ",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pickup request confirmed,wait for a driver response",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No pickup request exists with the given id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "2004": {
+                        "description": "No driver available right now",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "202": {
+                        "description": "Pickup request has been approved by another driver",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Pickup request has been canceled by client",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pickup-requests/initialize": {
             "post": {
                 "tags": [
