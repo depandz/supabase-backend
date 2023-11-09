@@ -30,7 +30,7 @@ class PickupRequestApproved implements ShouldBroadcast
     {
       
         return [
-            new PrivateChannel('pickup_request.'.$this->pickup->s_id)
+            new Channel('pickup_request.'.$this->pickup->s_id)
         ];
     }
    /**

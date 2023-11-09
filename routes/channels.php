@@ -16,6 +16,9 @@ use Illuminate\Support\Facades\Broadcast;
 Broadcast::channel('App.Models.User.{id}', function ($user, $id) {
     return (int) $user->id === (int) $id;
 });
-Broadcast::channel('{s_id}.pickup_request.{id}', function ($user,$id) {
+Broadcast::channel('pickup_request.{s_id}', function ($user,$s_id) {
+    return true;
+});
+Broadcast::channel('pickup_request.{driver_sid}', function ($user,$driver_sid) {
     return true;
 });
