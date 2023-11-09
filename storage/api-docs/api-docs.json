@@ -607,7 +607,7 @@
                 ],
                 "responses": {
                     "200": {
-                        "description": "Pickup request confirmed,wait for a driver response",
+                        "description": "Pickup request declined / approved successfully",
                         "content": {
                             "application/json": {
                                 "schema": {}
@@ -623,15 +623,15 @@
                         }
                     },
                     "404": {
-                        "description": "No pickup request exists with the given id",
+                        "description": "No pickup request exists with the given s_id",
                         "content": {
                             "application/json": {
                                 "schema": {}
                             }
                         }
                     },
-                    "2004": {
-                        "description": "No driver available right now",
+                    "403": {
+                        "description": "You are not authorized to do deal with this pickup request",
                         "content": {
                             "application/json": {
                                 "schema": {}
@@ -698,7 +698,7 @@
                                     },
                                     "duration": {
                                         "type": "string",
-                                        "example": "20:00"
+                                        "example": "20 min"
                                     },
                                     "licence_plate": {
                                         "type": "string",
@@ -798,6 +798,68 @@
                 "responses": {
                     "200": {
                         "description": "Pickup request confirmed successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No pickup request exists with the given id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/pickup-requests/{s_id}/cancel": {
+            "post": {
+                "tags": [
+                    "pickup_requests"
+                ],
+                "summary": "cancel pickup request ",
+                "operationId": "cancel_pickup_request",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "Pickup request secret id ",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "date_cancelled": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "17-09-2023 15:22"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pickup request cancelled successfully",
                         "content": {
                             "application/json": {
                                 "schema": {}

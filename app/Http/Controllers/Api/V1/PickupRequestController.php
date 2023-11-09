@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use DateTime;
 use App\Enums\VehicleTypes;
 use Illuminate\Http\Request;
+use App\Models\PickupRequest;
 use App\Pipes\FetchDriversList;
 use Illuminate\Pipeline\Pipeline;
 use App\Enums\PickupRequestStatus;
@@ -14,12 +15,12 @@ use App\Pipes\PickupPriceCalculator;
 use Illuminate\Support\Facades\Date;
 use App\Contracts\PickUpRequestContract;
 use App\DataTransferObjects\PositionDTO;
+use App\Events\StartPickupRequestCalling;
+use App\Http\Requests\CancelPickupRequest;
 use App\Http\Requests\ConfirmPickupRequest;
 use App\Http\Requests\InitializePickupRequest;
 use App\Pipes\DriversDistanceFromClientCalculator;
 use App\DataTransferObjects\PickupRequestDTO as PickupRequestObject;
-use App\Events\StartPickupRequestCalling;
-use App\Models\PickupRequest;
 
 class PickupRequestController extends Controller
 {
@@ -168,32 +169,72 @@ class PickupRequestController extends Controller
                 ->send();
         }
         $pickup_request = $this->pickup_request_contract->confirm(
-            $s_id,  Date::createFromTimeString($request->date_confirmed)
+            $s_id,
+            Date::createFromTimeString($request->date_confirmed)
         );
-        $driver =json_decode($pickup_request->drivers,true)[0];
-    
-        event(new StartPickupRequestCalling($pickup_request,$driver));
+        $driver = json_decode($pickup_request->drivers, true)[0];
+
+        event(new StartPickupRequestCalling($pickup_request, $driver));
         return $this->api_responser
             ->success()
             ->payload([
-                'pickup_request'=>
+                'pickup_request' =>
                 [
-                        's_id'=>$pickup_request->s_id,
-                        'location'=>$pickup_request->location,
-                        'destination'=>$pickup_request->destination,
-                        'estimated_price'=>$pickup_request->estimated_price,
-                        'estimated_duration'=>$pickup_request->estimated_duration,
-                        'driver'=>
-                            [
-                                's_id'=>$driver['s_id'],
-                                'full_name'=>$driver['full_name'],
-                                'phone_number'=>$driver['phone_number'],
-                                'location'=>$driver['location'],
-                                'photo'=>url('storage/drivers/photos/'.$driver['photo']),
-                            ]
+                    's_id' => $pickup_request->s_id,
+                    'location' => $pickup_request->location,
+                    'destination' => $pickup_request->destination,
+                    'estimated_price' => $pickup_request->estimated_price,
+                    'estimated_duration' => $pickup_request->estimated_duration,
+                    'driver' =>
+                    [
+                        's_id' => $driver['s_id'],
+                        'full_name' => $driver['full_name'],
+                        'phone_number' => $driver['phone_number'],
+                        'location' => $driver['location'],
+                        'photo' => url('storage/drivers/photos/' . $driver['photo']),
+                    ]
                 ]
             ])
             ->message('Pickup request confirmed successfully')
+            ->send();
+    }
+    /**
+     * @OA\Post(
+     * path="/api/v1/pickup-requests/{s_id}/cancel",
+     * operationId="cancel_pickup_request",
+     * tags={"pickup_requests"},
+     * summary="cancel pickup request ",
+     * @OA\Parameter(  name="s_id", in="path", description="Pickup request secret id ", required=true),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="date_cancelled",type="date",example="17-09-2023 15:22"),
+     *             )),
+     *    ),
+     *    @OA\Response( response=200, description="Pickup request cancelled successfully", @OA\JsonContent() ),
+     *    @OA\Response( response=404, description="No pickup request exists with the given id", @OA\JsonContent() ),
+     *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *     )
+     */
+    public function cancel(CancelPickupRequest $request, $s_id)
+    {
+        $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
+        if (!firstOf($pickup_request)) {
+            return  $this->api_responser
+                ->failed()
+                ->code(404)
+                ->message('No Pickup request exists with the given s_id')
+                ->send();
+        }
+        $pickup_request = $this->pickup_request_contract->cancel(
+            $s_id,
+            Date::createFromTimeString($request->date_cancelled)
+        );
+        return $this->api_responser
+            ->success()
+            ->message('Pickup request cancelled successfully')
             ->send();
     }
 }
