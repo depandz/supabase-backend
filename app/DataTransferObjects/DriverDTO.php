@@ -7,6 +7,7 @@ use DateTime;
 class DriverDTO
 {
     public function __construct(
+        public ?string $id = null,
         public ?string $s_id = null,
         public ?string $full_name = null,
         public ?string $phone_number = null,

@@ -41,8 +41,10 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::post('/login','login');
         Route::get('{s_id}','show');
         Route::put('{s_id}/update','update');
+        Route::post('{s_id}/pickup-requests/{pickup_sid}/{action}','AcceptDeclinePickupRequest');
     });
     Route::controller(PickupRequestController::class)->prefix('pickup-requests')->group(function(){
         Route::post('/initialize','initialize');
+        Route::post('/{s_id}/confirm','confirm');
     });
 });

@@ -5,12 +5,14 @@ namespace App\Services\SupaBase;
 use DateTime;
 use Exception;
 use App\Contracts\PickupRequestContract;
+use App\DataTransferObjects\DriverDTO as Driver;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use App\DataTransferObjects\PickupRequestDTO as PickpRequestObject;
 use App\DataTransferObjects\PositionDTO;
 use App\Enums\GlobalVars;
 use App\Enums\PickupRequestStatus;
+use Illuminate\Support\Facades\Date;
 
 class PickupRequest implements PickupRequestContract
 {
@@ -31,16 +33,17 @@ class PickupRequest implements PickupRequestContract
                                         $item['s_id'],
                                         $item['client_id'],
                                         $item['driver_id'],
-                                        $item['current_province_id'],
-                                        $item['location'],
-                                        $item['destination'],
+                                        new PositionDTO(lat: $item['location']->lat,lng:$item['location']->lng),
+                                        new PositionDTO(lat: $item['destination']->lat,lng:$item['destination']->lng),
                                         $item['estimated_distance'],
+                                        $item['estimated_price'],
                                         $item['estimated_duration'],
                                         $item['vehicle_type'],
                                         $item['is_vehicle_empty'],
-                                        $item['licence_plate'],
+                                        $item['vehicle_licence_plate'],
                                         $item['date_requested'],
                                         $item['status'],
+                                        $item['drivers'],
                                     );
                                 });
 
@@ -61,16 +64,17 @@ class PickupRequest implements PickupRequestContract
                                             $item['s_id'],
                                             $item['client_id'],
                                             $item['driver_id'],
-                                            $item['current_province_id'],
-                                            $item['location'],
-                                            $item['destination'],
+                                            new PositionDTO(lat: $item['location']->lat,lng:$item['location']->lng),
+                                            new PositionDTO(lat: $item['destination']->lat,lng:$item['destination']->lng),
                                             $item['estimated_distance'],
+                                            $item['estimated_price'],
                                             $item['estimated_duration'],
                                             $item['vehicle_type'],
                                             $item['is_vehicle_empty'],
-                                            $item['licence_plate'],
+                                            $item['vehicle_licence_plate'],
                                             $item['date_requested'],
                                             $item['status'],
+                                            $item['drivers'],
                                         );
             });
 
@@ -95,16 +99,17 @@ class PickupRequest implements PickupRequestContract
                                             $item['s_id'],
                                             $item['client_id'],
                                             $item['driver_id'],
-                                            $item['current_province_id'],
-                                            $item['location'],
-                                            $item['destination'],
+                                            new PositionDTO(lat: $item['location']->lat,lng:$item['location']->lng),
+                                            new PositionDTO(lat: $item['destination']->lat,lng:$item['destination']->lng),
                                             $item['estimated_distance'],
+                                            $item['estimated_price'],
                                             $item['estimated_duration'],
                                             $item['vehicle_type'],
                                             $item['is_vehicle_empty'],
-                                            $item['licence_plate'],
+                                            $item['vehicle_licence_plate'],
                                             $item['date_requested'],
                                             $item['status'],
+                                            $item['drivers'],
                                         );
             });
 
@@ -142,6 +147,7 @@ class PickupRequest implements PickupRequestContract
                 $pickup_request['vehicle_licence_plate'],
                 $pickup_request['date_requested'],
                 $pickup_request['status'],
+                $pickup_request['drivers'],
             );
 
         } catch (Exception $ex) {
@@ -153,25 +159,27 @@ class PickupRequest implements PickupRequestContract
     {
         try {
             $data=array_filter($data, fn ($value) => $value );
-            if(array_key_exists('location',$data)){
-                $data['location'] = json_encode($data['location']);
-            }
+            // if(array_key_exists('location',$data)){
+            //     $data['location'] = json_encode($data['location']);
+            // }
             $pickup_request = $data = supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id,$data);
-            // $pickup_request =  (array)$pickup_request[0];
+            $pickup_request =  (array)$pickup_request[0];
 
             return new PickpRequestObject(
                 $pickup_request['s_id'],
                 $pickup_request['client_id'],
                 $pickup_request['driver_id'],
-                new PositionDTO(json_decode($pickup_request['location'])),
-                new PositionDTO(json_decode($pickup_request['destination'])),
+                new PositionDTO(lat: $pickup_request['location']->lat,lng:$pickup_request['location']->lng),
+                new PositionDTO(lat: $pickup_request['destination']->lat,lng:$pickup_request['destination']->lng),
                 $pickup_request['estimated_distance'],
+                $pickup_request['estimated_price'],
                 $pickup_request['estimated_duration'],
                 $pickup_request['vehicle_type'],
                 $pickup_request['is_vehicle_empty'],
-                $pickup_request['licence_plate'],
+                $pickup_request['vehicle_licence_plate'],
                 $pickup_request['date_requested'],
                 $pickup_request['status'],
+                $pickup_request['drivers'],
             );
 
         } catch (Exception $ex) {
@@ -221,9 +229,26 @@ class PickupRequest implements PickupRequestContract
                     $pickup_request['vehicle_licence_plate'],
                     $pickup_request['date_requested'],
                     $pickup_request['status'],
+                    $pickup_request['drivers'],
                 );
             });
         return firstOf($pickup_requests);
+    }
+    public function confirm(string $s_id, $date_confirmed): PickpRequestObject | null
+    {
+        $data =[
+            'updated_at' => Date::createFromTimeString($date_confirmed),
+            'status'=> PickupRequestStatus::PENDING->value
+        ];
+        return $this->update($s_id,$data);
+    }
+    public function approve(string $s_id, int $driver_id): PickpRequestObject | null
+    {
+        $data =[
+            'driver_id' => $driver_id,
+            'status'=> PickupRequestStatus::APPROVED->value
+        ];
+        return $this->update($s_id,$data);
     }
     
 }

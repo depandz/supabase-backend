@@ -28,7 +28,7 @@ class Driver implements DriverContract
                 $item =(array)$item;
                 $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                 return new DriverObject(
-                    $item['s_id'],
+                    $item['id'], $item['s_id'],
                     $item['full_name'],
                     $item['phone_number'],
                     $item['gender'],
@@ -70,7 +70,7 @@ class Driver implements DriverContract
                 $item =(array)$item;
                 $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                 return new DriverObject(
-                    $item['s_id'],
+                    $item['id'], $item['s_id'], 
                     $item['full_name'],
                     $item['phone_number'],
                     $item['gender'],
@@ -118,7 +118,7 @@ class Driver implements DriverContract
                                    
                                         $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                                         return new DriverObject(
-                                            $item['s_id'],
+                                            $item['id'], $item['s_id'], 
                                             $item['full_name'],
                                             $item['phone_number'],
                                             $item['gender'],
@@ -168,7 +168,7 @@ class Driver implements DriverContract
                     $item = (array)$item;
                     $item['company'] = $item['companies'];
                     return new DriverObject(
-                        $item['s_id'],
+                        $item['id'], $item['s_id'], 
                         $item['full_name'],
                         $item['phone_number'],
                         $item['gender'],
@@ -225,6 +225,7 @@ class Driver implements DriverContract
 
             $driver['company'] = $driver['companies'];
                 return new DriverObject(
+                    $driver['id'],
                     $driver['s_id'],
                     $driver['full_name'],
                     $driver['phone_number'],
