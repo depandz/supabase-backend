@@ -365,6 +365,50 @@
                 }
             }
         },
+        "/api/v1/clients/{s_id}/pickups-history": {
+            "get": {
+                "tags": [
+                    "clients"
+                ],
+                "summary": "get client  pickups history using secret id",
+                "description": "get client  pickup history using secret id",
+                "operationId": "get client pickups history",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "Client secret id ",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Client  pickups history fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "no client found",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/drivers/{s_id}": {
             "get": {
                 "tags": [

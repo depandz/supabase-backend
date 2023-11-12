@@ -258,5 +258,28 @@ class PickupRequest implements PickupRequestContract
         ];
         return $this->update($s_id,$data) ? true : false;
     }
+    public function history(int $id,string $type): Collection | null
+    {
+        try {
+            $query = [
+                'select' => 'location,destination,date_requested,estimated_price,status',
+                'from'   => 'pickup_requests',
+                'where' => 
+                [
+                    $type.'_id' => 'eq.'.$id,
+                    'status' => 'eq.validated',
+                    // 'status' => 'eq.'.PickupRequestStatus::APPROVED->value,
+                ],
+                'order' => 'date_requested.desc'
+            ];
+            $grouped_by_date=[];
+            $pickup_requests = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
+                ->groupBy('date_requested');
+
+            return $pickup_requests;
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
     
 }

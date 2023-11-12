@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use Exception;
 use Illuminate\Http\Request;
 use App\Contracts\ClientContract;
+use App\Contracts\PickUpRequestContract;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRegisterRequest;
 use App\Services\Locale\Client as ClientRepository;
@@ -16,15 +17,17 @@ class ClientController extends Controller
      
 
         public $client_contract;
+        public $pickup;
         protected $repository;
         /**
          * @var ClientContract
          * @var ClientRepository
          */
-        public function __construct(ClientContract $client_contract,ClientRepository $repository)
+        public function __construct(ClientContract $client_contract,ClientRepository $repository,PickUpRequestContract $pickup)
         {
             parent::__construct();
             $this->client_contract = $client_contract;
+            $this->pickup = $pickup;
             $this->repository = $repository;
         }
 
@@ -290,5 +293,45 @@ class ClientController extends Controller
                     ->send();
             }
      
+        }
+          /**
+        * @OA\Get(
+        * path="/api/v1/clients/{s_id}/pickups-history",
+        * operationId="get client pickups history",
+        * tags={"clients"},
+        * summary="get client  pickups history using secret id",
+        * description="get client  pickup history using secret id",
+        * @OA\Parameter(  name="s_id", in="path", description="Client secret id ", required=true),
+        * @OA\Response( response=200, description="Client  pickups history fetched successfully", @OA\JsonContent() ),
+        * @OA\Response( response=404,description="no client found", @OA\JsonContent()),
+        * @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+        *     )
+        */
+        public function pickupsHistory($s_id)
+        {
+            try {
+                $client = firstOf($this->client_contract->findBy('s_id', $s_id));
+                if($client){
+                    $pickups = $this->pickup->history(id:$client->id,type:"client");
+
+                    return $this->api_responser
+                    ->success()
+                    ->message('Client  pickups history fetched successfully')
+                    ->payload($pickups)
+                    ->send();
+                }
+                return $this->api_responser
+                    ->failed()
+                    ->code(404)
+                    ->message('no client found')
+                    ->send();
+            }
+            catch(Exception $ex){
+                
+                return $this->api_responser
+                    ->failed($ex->getCode())
+                    ->message($ex->getMessage())
+                    ->send();
+            } 
         }
 }

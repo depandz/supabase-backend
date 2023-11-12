@@ -34,6 +34,7 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::get('{s_id}','show');
         Route::put('{s_id}/update','update');
         Route::post('{s_id}/update-photo','updatePhoto');
+        Route::get('{s_id}/pickups-history','pickupsHistory');
     });
     //driver 
     Route::controller(DriverController::class)->prefix('drivers')->group(function(){
