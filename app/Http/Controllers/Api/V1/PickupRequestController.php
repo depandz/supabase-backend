@@ -228,10 +228,12 @@ class PickupRequestController extends Controller
                 ->message('No Pickup request exists with the given s_id')
                 ->send();
         }
-        $pickup_request = $this->pickup_request_contract->cancel(
-            $s_id,
-            Date::createFromTimeString($request->date_cancelled)
-        );
+        if (firstOf($pickup_request)->status != PickupRequestStatus::CANCELED->value) {
+            $pickup_request = $this->pickup_request_contract->cancel(
+                $s_id,
+                Date::createFromTimeString($request->date_cancelled)
+            );
+        }
         return $this->api_responser
             ->success()
             ->message('Pickup request cancelled successfully')
