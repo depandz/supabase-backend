@@ -250,5 +250,13 @@ class PickupRequest implements PickupRequestContract
         ];
         return $this->update($s_id,$data);
     }
+    public function cancel(string $s_id, $date_cancelled): bool | null
+    {
+        $data =[
+            'updated_at' => Date::createFromTimeString($date_cancelled),
+            'status'=> PickupRequestStatus::CANCELED->value
+        ];
+        return $this->update($s_id,$data) ? true : false;
+    }
     
 }

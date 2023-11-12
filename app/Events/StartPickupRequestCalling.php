@@ -29,7 +29,7 @@ class StartPickupRequestCalling implements ShouldBroadcast
     {
       
         return [
-            new PrivateChannel('pickup_request.'.$this->driver['s_id'])
+            new Channel('pickup_request.'.$this->driver['s_id'])
         ];
     }
     /**
