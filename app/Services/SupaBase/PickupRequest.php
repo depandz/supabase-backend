@@ -262,7 +262,7 @@ class PickupRequest implements PickupRequestContract
     {
         try {
             $query = [
-                'select' => 'location,destination,date_requested,estimated_price,status',
+                'select' => 'location,destination,date_requested,estimated_price,status,due_date,due_address',
                 'from'   => 'pickup_requests',
                 'where' => 
                 [
@@ -272,11 +272,12 @@ class PickupRequest implements PickupRequestContract
                 ],
                 'order' => 'date_requested.desc'
             ];
-            $grouped_by_date=[];
-            $pickup_requests = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
-                ->groupBy('date_requested');
-
-            return $pickup_requests;
+            $pickups=Collection::make([]);
+            $pickup_requests = Collection::make($this->db_instance->createCustomQuery($query)->getResult());
+            $pickups['history'] = $pickup_requests->filter(fn($item) =>!$item->due_date)->groupBy('date_requested');
+            $pickups['upcoming'] = $pickup_requests->filter(fn($item) =>$item->due_date)->groupBy('due_date');
+            
+            return $pickups;
         } catch (Exception $ex) {
             throw $ex;
         }
