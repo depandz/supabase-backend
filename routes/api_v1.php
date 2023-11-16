@@ -48,5 +48,6 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::post('/initialize','initialize');
         Route::post('/{s_id}/confirm','confirm');
         Route::post('/{s_id}/cancel','cancel');
+        Route::post('/{s_id}/rate','rateDriver');
     });
 });

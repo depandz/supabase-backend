@@ -21,4 +21,6 @@ interface PickUpRequestContract extends SupaBaseContract
     public function cancel(string $s_id, $date_cancelled): bool |null;
 
     public function history(int $id,string $type): Collection |null;
+
+    public function rate(string $s_id,int $rating,?string $rating_comment): bool |null;
 }

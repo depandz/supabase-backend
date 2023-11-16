@@ -13,6 +13,7 @@ use App\Pipes\ProvinceDataFetcher;
 use App\Http\Controllers\Controller;
 use App\Pipes\PickupPriceCalculator;
 use Illuminate\Support\Facades\Date;
+use App\Http\Requests\AddRatingRequest;
 use App\Contracts\PickUpRequestContract;
 use App\DataTransferObjects\PositionDTO;
 use App\Events\StartPickupRequestCalling;
@@ -64,6 +65,7 @@ class PickupRequestController extends Controller
      */
     public function initialize(InitializePickupRequest $request)
     {
+        try{
         $data = $request->all();
         //check client exists
         $client = checkClientExists($request->client_id);
@@ -107,6 +109,12 @@ class PickupRequestController extends Controller
                 'pickup_request' => $result,
             ])
             ->send();
+        } catch (\Exception $ex) {
+            return $this->api_responser
+                ->failed()
+                ->message('Error when rating pickup request ' . $ex->getMessage())
+                ->send();
+        }
     }
     public function store(array $data)
     {
@@ -160,6 +168,7 @@ class PickupRequestController extends Controller
      */
     public function confirm(ConfirmPickupRequest $request, $s_id)
     {
+        try{
         $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
         if (!firstOf($pickup_request)) {
             return  $this->api_responser
@@ -197,6 +206,12 @@ class PickupRequestController extends Controller
             ])
             ->message('Pickup request confirmed successfully')
             ->send();
+        } catch (\Exception $ex) {
+            return $this->api_responser
+                ->failed()
+                ->message('Error when rating pickup request ' . $ex->getMessage())
+                ->send();
+        }
     }
     /**
      * @OA\Post(
@@ -220,6 +235,7 @@ class PickupRequestController extends Controller
      */
     public function cancel(CancelPickupRequest $request, $s_id)
     {
+        try{
         $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
         if (!firstOf($pickup_request)) {
             return  $this->api_responser
@@ -238,5 +254,67 @@ class PickupRequestController extends Controller
             ->success()
             ->message('Pickup request cancelled successfully')
             ->send();
+        } catch (\Exception $ex) {
+            return $this->api_responser
+                ->failed()
+                ->message('Error when rating pickup request ' . $ex->getMessage())
+                ->send();
+        }
+    }
+    /**
+     * @OA\Post(
+     * path="/api/v1/pickup-requests/{s_id}/rate",
+     * operationId="rate_pickup_request",
+     * tags={"pickup_requests"},
+     * summary="rate pickup request ",
+     * @OA\Parameter(  name="s_id", in="path", description="Pickup request secret id ", required=true),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="rating",type="integer",enum={1,2,3,4,5},example=4),
+     *                 @OA\Property(property="rating_comment",type="text"),
+     *             )),
+     *    ),
+     *    @OA\Response( response=200, description="Pickup request rated successfully", @OA\JsonContent() ),
+     *    @OA\Response( response=404, description="No pickup request exists with the given id", @OA\JsonContent() ),
+     *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *     )
+     */
+    public function rateDriver(AddRatingRequest $request, $s_id)
+    {
+        try {
+            $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
+            if (!firstOf($pickup_request)) {
+                return  $this->api_responser
+                    ->failed()
+                    ->code(404)
+                    ->message('No Pickup request exists with the given s_id')
+                    ->send();
+            }
+            if (firstOf($pickup_request)->status != PickupRequestStatus::VALIDATED->value) {
+                return  $this->api_responser
+                    ->failed()
+                    ->code(202)
+                    ->message('The pickup request is not validated yet')
+                    ->send();
+            }
+            $pickup_request = $this->pickup_request_contract->rate(
+                $s_id,
+                rating: $request->rating,
+                rating_comment: $request->rating_comment
+            );
+
+            return $this->api_responser
+                ->success()
+                ->message('Pickup request rated successfully')
+                ->send();
+        } catch (\Exception $ex) {
+            return $this->api_responser
+                ->failed()
+                ->message('Error when rating pickup request ' . $ex->getMessage())
+                ->send();
+        }
     }
 }

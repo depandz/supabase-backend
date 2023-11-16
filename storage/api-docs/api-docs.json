@@ -929,6 +929,77 @@
                 }
             }
         },
+        "/api/v1/pickup-requests/{s_id}/rate": {
+            "post": {
+                "tags": [
+                    "pickup_requests"
+                ],
+                "summary": "rate pickup request ",
+                "operationId": "rate_pickup_request",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "Pickup request secret id ",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "rating": {
+                                        "type": "integer",
+                                        "enum": [
+                                            1,
+                                            2,
+                                            3,
+                                            4,
+                                            5
+                                        ],
+                                        "example": 4
+                                    },
+                                    "rating_comment": {
+                                        "type": "text"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pickup request rated successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No pickup request exists with the given id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/provinces/": {
             "get": {
                 "tags": [
