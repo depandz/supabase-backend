@@ -5,6 +5,7 @@ use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\PageController;
 use App\Http\Controllers\Api\V1\ClientController;
 use App\Http\Controllers\Api\V1\DriverController;
+use App\Http\Controllers\Api\V1\SettingController;
 use App\Http\Controllers\Api\V1\ProvinceController;
 use App\Http\Controllers\Api\V1\PickupRequestController;
 
@@ -51,5 +52,6 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::post('/{s_id}/cancel','cancel');
         Route::post('/{s_id}/rate','rateDriver');
     });
-    Route::get('/pages/{lang}/{title}', [PageController::class, 'index']);
+    Route::get('/pages/{lang}/{title}', [SettingController::class, 'page']);
+    Route::get('/app-settings', [SettingController::class, 'appSettings']);
 });

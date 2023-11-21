@@ -13,7 +13,8 @@
         "laravel/sanctum": "^3.2",
         "laravel/tinker": "^2.8",
         "pusher/pusher-php-server": "^7.2",
-        "rafaelwendel/phpsupabase": "^0.0.5"
+        "rafaelwendel/phpsupabase": "^0.0.5",
+        "spatie/laravel-settings": "^3.2"
     },
     "require-dev": {
         "doctrine/dbal": "^3.6",
