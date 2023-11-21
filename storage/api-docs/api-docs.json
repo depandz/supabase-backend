@@ -701,6 +701,48 @@
                 }
             }
         },
+        "/api/v1/pages/{lang}/{title}": {
+            "get": {
+                "tags": [
+                    "pages"
+                ],
+                "summary": "get page details by title ",
+                "description": "get page details by title  ",
+                "operationId": "getPageByTitle",
+                "parameters": [
+                    {
+                        "name": "lang",
+                        "in": "path",
+                        "description": "the page language(ar,en,fr)",
+                        "required": true
+                    },
+                    {
+                        "name": "title",
+                        "in": "path",
+                        "description": "the page title",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "page fetched succefully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "no page found with the given title",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pickup-requests/initialize": {
             "post": {
                 "tags": [
