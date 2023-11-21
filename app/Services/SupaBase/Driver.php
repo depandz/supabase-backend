@@ -4,11 +4,13 @@ namespace App\Services\SupaBase;
 
 
 use DateTime;
-use App\Contracts\DriverContract;
-use App\DataTransferObjects\DriverDTO as DriverObject;
-use App\Enums\AccountStatus;
 use Exception;
+use Illuminate\Support\Str;
+use App\Enums\AccountStatus;
+use App\Contracts\DriverContract;
 use Illuminate\Support\Collection;
+use App\DataTransferObjects\DriverDTO as DriverObject;
+use App\Enums\PickupRequestStatus;
 
 class Driver implements DriverContract
 {
@@ -27,6 +29,8 @@ class Driver implements DriverContract
             ->map(function ($item) {
                 $item =(array)$item;
                 $item['company'] = isset($item['companies']) ? $item['companies'] : null;
+                $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                                    url('storage/'.$item['photo']);
                 return new DriverObject(
                     $item['id'], $item['s_id'],
                     $item['full_name'],
@@ -69,6 +73,25 @@ class Driver implements DriverContract
             ->map(function ($item) {
                 $item =(array)$item;
                 $item['company'] = isset($item['companies']) ? $item['companies'] : null;
+
+                $rating = supabase_instance()->initializeQueryBuilder()
+                                    ->select('rating', ['count' => 'rating', 'head'=> true])
+                                    ->from('pickup_requests')
+                                    ->where('driver_id', 'eq.'.$item['id'])
+                                    ->where('status', 'eq.'.PickupRequestStatus::VALIDATED->value)
+                                    ->execute()
+                                    ->getResult();
+                $item['rating'] = $rating ?? null;
+                $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                                    url('storage/'.$item['photo']);
+                
+                $rating_count = isset($item['rating']) ? count( $item['rating']) : 0;
+                $rating_sum = 0;
+                foreach( $item['rating'] as $v){
+                    $rating_sum+=$v->rating;
+                }
+                
+                $rating_final = $rating_count > 0  ? (round(($rating_sum / $rating_count) *2) /2) : 0;
                 return new DriverObject(
                     $item['id'], $item['s_id'], 
                     $item['full_name'],
@@ -88,7 +111,9 @@ class Driver implements DriverContract
                     $item['licence_plate'],
                     $item['is_online'],
                     $item['company'],
+                    $item['is_default_for_company'],
                     $item['can_transport_goods'],
+                    $rating_final
                 );
         });
 
@@ -117,6 +142,8 @@ class Driver implements DriverContract
                                         $item = (array) $item;
                                    
                                         $item['company'] = isset($item['companies']) ? $item['companies'] : null;
+                                        $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                                    url('storage/'.$item['photo']);
                                         return new DriverObject(
                                             $item['id'], $item['s_id'], 
                                             $item['full_name'],
@@ -167,6 +194,8 @@ class Driver implements DriverContract
                 ->map(function ($item) {
                     $item = (array)$item;
                     $item['company'] = $item['companies'];
+                    $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                                    url('storage/'.$item['photo']);
                     return new DriverObject(
                         $item['id'], $item['s_id'], 
                         $item['full_name'],
@@ -186,6 +215,7 @@ class Driver implements DriverContract
                         $item['licence_plate'],
                         $item['is_online'],
                         $item['company'],
+                        $item['is_default_for_company'],
                         $item['can_transport_goods'],
                     );
                 });
@@ -224,6 +254,8 @@ class Driver implements DriverContract
             $driver =  (array)$driver[0];
 
             $driver['company'] = $driver['companies'];
+            $driver['photo'] = Str::startsWith('https://ui-avatars',$driver['photo']) ? $driver['photo'] :
+                                                    url('storage/'.$driver['photo']);
                 return new DriverObject(
                     $driver['id'],
                     $driver['s_id'],
@@ -244,6 +276,7 @@ class Driver implements DriverContract
                     $driver['licence_plate'],
                     $driver['is_online'],
                     $driver['company'],
+                    $driver['is_default_for_company'],
                     $driver['can_transport_goods'],
                 );
 

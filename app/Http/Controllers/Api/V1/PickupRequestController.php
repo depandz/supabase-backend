@@ -82,13 +82,15 @@ class PickupRequestController extends Controller
                 $pickup_request = $this->store($data);
                 $pickup_request->drivers = collect($data['available_drivers'])->map(function ($driver) {
                     return [
+                        "id" => $driver->id,
                         "s_id" => $driver->s_id,
                         "full_name" => $driver->full_name,
                         "phone_number" => $driver->phone_number,
                         "location" => $driver->location,
                         "photo" => $driver->photo,
                         "reported_count" => $driver->reported_count,
-                        "capacity" => $driver->capacity
+                        "capacity" => $driver->capacity,
+                        "rating" => $driver->rating
                     ];
                 });
                 return $pickup_request;
@@ -112,7 +114,7 @@ class PickupRequestController extends Controller
         } catch (\Exception $ex) {
             return $this->api_responser
                 ->failed()
-                ->message('Error when rating pickup request ' . $ex->getMessage())
+                ->message('Error when initializing pickup request ' . $ex->getMessage())
                 ->send();
         }
     }
@@ -209,7 +211,7 @@ class PickupRequestController extends Controller
         } catch (\Exception $ex) {
             return $this->api_responser
                 ->failed()
-                ->message('Error when rating pickup request ' . $ex->getMessage())
+                ->message('Error when confirming pickup request ' . $ex->getMessage())
                 ->send();
         }
     }
@@ -257,7 +259,7 @@ class PickupRequestController extends Controller
         } catch (\Exception $ex) {
             return $this->api_responser
                 ->failed()
-                ->message('Error when rating pickup request ' . $ex->getMessage())
+                ->message('Error when cancelling pickup request ' . $ex->getMessage())
                 ->send();
         }
     }

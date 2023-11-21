@@ -28,6 +28,7 @@ class DriverDTO
         public ?object $company = null,
         public ?bool $is_default_for_company = false,
         public ?bool $can_transport_goods = false,
+        public  ?float $rating=0,
 
     ) {
         $this->registered_at = (new DateTime($this->registered_at))->format('d-m-Y H:i');

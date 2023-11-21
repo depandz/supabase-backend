@@ -4,11 +4,12 @@ namespace App\Services\SupaBase;
 
 use DateTime;
 use Exception;
+use App\Enums\GlobalVars;
+use Illuminate\Support\Str;
 use App\Contracts\ClientContract;
 use Illuminate\Support\Collection;
 use Illuminate\Validation\ValidationException;
 use App\DataTransferObjects\ClientDTO as CLientObject;
-use App\Enums\GlobalVars;
 
 class Client implements ClientContract
 {
@@ -25,7 +26,8 @@ class Client implements ClientContract
         $clients = Collection::make($this->db_instance->fetchAll()->getResult())
                                 ->map(function ($item) {
                                     $item = (array) $item;
-                                   
+                                    $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                                    url('storage/'.$item['photo']);
                                     return new ClientObject(
                                         $item['id'],
                                         $item['s_id'],
@@ -54,7 +56,8 @@ class Client implements ClientContract
                                     ->getResult())
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                        
+                                        $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                                    url('storage/'.$item['photo']);
                                         return new ClientObject(
                                             $item['id'],
                                             $item['s_id'],
@@ -87,7 +90,8 @@ class Client implements ClientContract
                                     )
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                        
+                                        $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                                    url('storage/'.$item['photo']);
                                         return new ClientObject(
                                             $item['id'],
                                             $item['s_id'],
@@ -119,7 +123,9 @@ class Client implements ClientContract
 
             $client = (array)$this->db_instance->insert($data)[0];
             
- 
+            $client['photo'] = Str::startsWith('https://ui-avatars',$client['photo']) ? $client['photo'] :
+            url('storage/'.$client['photo']);
+            
             return new ClientObject(
                 $client['id'],
                 $client['s_id'],
@@ -153,6 +159,9 @@ class Client implements ClientContract
             }
             $client = $data = supabase_instance()->initializeDatabase('clients', 's_id')->update($s_id,$data);
             $client =  (array)$client[0];
+
+            $client['photo'] = Str::startsWith('https://ui-avatars',$client['photo']) ? $client['photo'] :
+                     url('storage/'.$client['photo']);
 
             return new ClientObject(
                 $client['id'],
@@ -189,7 +198,7 @@ class Client implements ClientContract
                     unlink($client[0]->photo);
                 };
                 $new_photo = $photo->storePublicly(
-                    "clients",
+                    "clients/photos",  
                     ['disk' => 'public']
                 );
             }
