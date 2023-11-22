@@ -2,6 +2,7 @@
 
 namespace App\Settings;
 
+use DateTime;
 use Spatie\LaravelSettings\Settings;
 
 class AppSettings extends Settings
@@ -18,6 +19,7 @@ class AppSettings extends Settings
     public string $linkedin_link;
     public string $website_link;
     public string $youtube_link;
+    public DateTime $provinces_last_updated_at;
     
     public static function group(): string
     {

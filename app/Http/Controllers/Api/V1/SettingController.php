@@ -67,24 +67,25 @@ class SettingController extends Controller
         public function appSettings(AppSettings $settings){
              try {
                 
-                
+                $settings =[ 'app_name'=>$settings->app_name,
+                'app_logo'=>$settings->app_logo,
+                'app_slogon'=>$settings->app_slogon,
+                // 'app_description'=>$settings->app_description,
+                'contact_mail'=>$settings->contact_mail,
+                'customer_service_number'=>$settings->customer_service_number,
+                'whatsapp_number'=>$settings->whatsapp_number,
+                'facebook_link'=>$settings->facebook_link,
+                'twitter_link'=>$settings->twitter_link,
+                'linkedin_link'=>$settings->linkedin_link,
+                'website_link'=>$settings->website_link,
+                'youtube_link'=>$settings->youtube_link,
+                'provinces_last_updated_at'=>$settings->provinces_last_updated_at->format('Y-m-d H:i:s')
+             ];
+             $settings['pages'] =PageResource::collection(Page::all());
                  return $this->api_responser->success()
                         ->message('settings fetched successfully')
                         ->payload(
-                            [
-                                'app_name'=>$settings->app_name,
-                                'app_logo'=>$settings->app_logo,
-                                'app_slogon'=>$settings->app_slogon,
-                                // 'app_description'=>$settings->app_description,
-                                'contact_mail'=>$settings->contact_mail,
-                                'customer_service_number'=>$settings->customer_service_number,
-                                'whatsapp_number'=>$settings->whatsapp_number,
-                                'facebook_link'=>$settings->facebook_link,
-                                'twitter_link'=>$settings->twitter_link,
-                                'linkedin_link'=>$settings->linkedin_link,
-                                'website_link'=>$settings->website_link,
-                                'youtube_link'=>$settings->youtube_link,
-                            ]
+                            $settings
                         )
                         ->send();
                 }

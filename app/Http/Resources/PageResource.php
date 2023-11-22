@@ -19,7 +19,7 @@ class PageResource extends JsonResource
         'sub_title'=>$this->sub_title,
         // 'slug'=>$this->slug,
         'content'=>$this->content,
-        // 'language'=>,
+        'language'=>$this->language,
        ];
     }
 }

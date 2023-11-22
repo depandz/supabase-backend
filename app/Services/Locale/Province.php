@@ -29,6 +29,7 @@ class Province  implements ProvinceContract
     }
     public function fetchAll(): Collection
     {
-        return Collection::make([]); 
+       
+        return Collection::make(ProvinceModel::all())->map(fn ($item) => new ProvinceObject($item->code, $item->name,$item->name_ar,$item->longitude,$item->latitude));
     }
 }
