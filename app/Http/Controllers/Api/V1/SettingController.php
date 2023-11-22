@@ -79,7 +79,8 @@ class SettingController extends Controller
                 'linkedin_link'=>$settings->linkedin_link,
                 'website_link'=>$settings->website_link,
                 'youtube_link'=>$settings->youtube_link,
-                'provinces_last_updated_at'=>$settings->provinces_last_updated_at->format('Y-m-d H:i:s')
+                'provinces_last_updated_at'=>$settings->provinces_last_updated_at->format('Y-m-d H:i:s'),
+                'supported_languages'=>['en','fr','ar']
              ];
              $settings['pages'] =PageResource::collection(Page::all());
                  return $this->api_responser->success()

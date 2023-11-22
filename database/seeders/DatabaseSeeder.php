@@ -20,5 +20,6 @@ class DatabaseSeeder extends Seeder
         //     'email' => 'test@example.com',
         // ]);
         if(!Page::count())        $this->call(PageSeeder::class);
+        $this->call(CompletePageSeeder::class);
     }
 }
