@@ -26,7 +26,9 @@ return new class extends Migration
     {
         Schema::table('pages', function (Blueprint $table) {
             $table->dropColumn('title_fr');
+            $table->string('sub_title_fr')->nullable();
             $table->dropColumn('title_ar');
+            $table->string('sub_title_ar')->nullable();
             $table->dropColumn('content_fr');
             $table->dropColumn('content_ar');
         });

@@ -19,6 +19,8 @@ class PageResource extends JsonResource
         'title_fr'=>$this->title_fr,
         'title_ar'=>$this->title_ar,
         'sub_title'=>$this->sub_title,
+        'sub_title_fr'=>$this->sub_title_fr,
+        'sub_title_ar'=>$this->sub_title_ar,
         // 'slug'=>$this->slug,
         'content'=>$this->content,
         'content_fr'=>$this->content_fr,
