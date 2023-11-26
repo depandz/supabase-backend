@@ -114,12 +114,12 @@ class ClientController extends Controller
                 //unset unwanted data
                 $data =$request->validated();
                 // Remove 'first_name' and 'last_name' keys
-                $first_name = $data['first_name'];
-                $last_name = $data['last_name'];
-                unset($data['first_name'], $data['last_name']);
+                // $first_name = $data['first_name'];
+                // $last_name = $data['last_name'];
+                // unset($data['first_name'], $data['last_name']);
 
                 // Concatenate 'first_name' and 'last_name' into 'full_name'
-                $data['full_name'] = $first_name . ' ' . $last_name;
+                // $data['full_name'] = $first_name . ' ' . $last_name;
                 $data['phone_number'] = ltrim($data['phone_number'],'+');
 
                 if($client)
@@ -220,7 +220,8 @@ class ClientController extends Controller
         *         @OA\MediaType(
         *            mediaType="application/x-www-form-urlencoded",
         *             @OA\Schema(
-        *                 @OA\Property( property="full_name",type="string",nullable=true),
+        *                 @OA\Property( property="first_name",type="string",nullable=true),
+        *                 @OA\Property( property="last_name",type="string",nullable=true),
         *                 @OA\Property(property="phone_number",type="string",nullable=true),
         *                 @OA\Property(property="location",type="object",example={"lang":"45558","lat":"4587.00"}),
         *                 @OA\Property(property="email",type="string",nullable=true),

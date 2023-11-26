@@ -26,12 +26,13 @@ class Client implements ClientContract
         $clients = Collection::make($this->db_instance->fetchAll()->getResult())
                                 ->map(function ($item) {
                                     $item = (array) $item;
-                                    $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                    $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
                                     return new ClientObject(
                                         $item['id'],
                                         $item['s_id'],
-                                        $item['full_name'],
+                                        $item['first_name'],
+                                        $item['last_name'],
                                         $item['phone_number'],
                                         $item['gender'],
                                         $item['location'],
@@ -56,12 +57,13 @@ class Client implements ClientContract
                                     ->getResult())
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                        $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                        $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
                                         return new ClientObject(
                                             $item['id'],
                                             $item['s_id'],
-                                            $item['full_name'],
+                                            $item['frist_name'],
+                                            $item['last_name'],
                                             $item['phone_number'],
                                             $item['gender'],
                                             $item['location'],
@@ -90,12 +92,13 @@ class Client implements ClientContract
                                     )
                                     ->map(function ($item) {
                                         $item = (array) $item;
-                                        $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                        $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
                                         return new ClientObject(
                                             $item['id'],
                                             $item['s_id'],
-                                            $item['full_name'],
+                                            $item['first_name'],
+                                            $item['last_name'],
                                             $item['phone_number'],
                                             $item['gender'],
                                             $item['location'],
@@ -119,17 +122,19 @@ class Client implements ClientContract
     {
         try {
             $data['s_id'] = generate_sid('client');
-            $data['photo'] = GlobalVars::getDefaultProfilePicture($data['full_name']);
+            $data['photo'] = GlobalVars::getDefaultProfilePicture($data['first_name']);
 
             $client = (array)$this->db_instance->insert($data)[0];
             
-            $client['photo'] = Str::startsWith('https://ui-avatars',$client['photo']) ? $client['photo'] :
+            $client['photo'] = Str::contains($client['photo'],'ui-avatars',true)
+             ? $client['photo'] :
             url('storage/'.$client['photo']);
             
             return new ClientObject(
                 $client['id'],
                 $client['s_id'],
-                $client['full_name'],
+                $client['first_name'],
+                $client['last_name'],
                 $client['phone_number'],
                 $client['gender'],
                 $client['location'],
@@ -160,13 +165,14 @@ class Client implements ClientContract
             $client = $data = supabase_instance()->initializeDatabase('clients', 's_id')->update($s_id,$data);
             $client =  (array)$client[0];
 
-            $client['photo'] = Str::startsWith('https://ui-avatars',$client['photo']) ? $client['photo'] :
+            $client['photo'] = Str::contains($client['photo'],'ui-avatars',true) ? $client['photo'] :
                      url('storage/'.$client['photo']);
 
             return new ClientObject(
                 $client['id'],
                 $client['s_id'],
-                $client['full_name'],
+                $client['first_name'],
+                $client['last_name'],
                 $client['phone_number'],
                 $client['gender'],
                 $client['location'],

@@ -261,7 +261,11 @@
                         "application/x-www-form-urlencoded": {
                             "schema": {
                                 "properties": {
-                                    "full_name": {
+                                    "first_name": {
+                                        "type": "string",
+                                        "nullable": true
+                                    },
+                                    "last_name": {
                                         "type": "string",
                                         "nullable": true
                                     },

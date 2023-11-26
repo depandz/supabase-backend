@@ -12,7 +12,8 @@ class ClientDTO
     public function __construct(
         public ?string $id=null,
         public ?string $s_id=null,
-        public ?string $full_name=null,
+        public ?string $first_name=null,
+        public ?string $last_name=null,
         public ?string $phone_number=null,
         public ?string $gender=null,
         public ?object $location=null,

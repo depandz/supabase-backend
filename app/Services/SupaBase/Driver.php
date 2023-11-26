@@ -29,7 +29,7 @@ class Driver implements DriverContract
             ->map(function ($item) {
                 $item =(array)$item;
                 $item['company'] = isset($item['companies']) ? $item['companies'] : null;
-                $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
                 return new DriverObject(
                     $item['id'], $item['s_id'],
@@ -82,7 +82,7 @@ class Driver implements DriverContract
                                     ->execute()
                                     ->getResult();
                 $item['rating'] = $rating ?? null;
-                $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                $item['photo'] =Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
                 
                 $rating_count = isset($item['rating']) ? count( $item['rating']) : 0;
@@ -142,7 +142,7 @@ class Driver implements DriverContract
                                         $item = (array) $item;
                                    
                                         $item['company'] = isset($item['companies']) ? $item['companies'] : null;
-                                        $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                                        $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
                                         return new DriverObject(
                                             $item['id'], $item['s_id'], 
@@ -194,7 +194,7 @@ class Driver implements DriverContract
                 ->map(function ($item) {
                     $item = (array)$item;
                     $item['company'] = $item['companies'];
-                    $item['photo'] = Str::startsWith('https://ui-avatars',$item['photo']) ? $item['photo'] :
+                    $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
                     return new DriverObject(
                         $item['id'], $item['s_id'], 
@@ -254,7 +254,7 @@ class Driver implements DriverContract
             $driver =  (array)$driver[0];
 
             $driver['company'] = $driver['companies'];
-            $driver['photo'] = Str::startsWith('https://ui-avatars',$driver['photo']) ? $driver['photo'] :
+            $driver['photo'] = Str::contains($driver['photo'],'ui-avatars',true) ? $driver['photo'] :
                                                     url('storage/'.$driver['photo']);
                 return new DriverObject(
                     $driver['id'],
