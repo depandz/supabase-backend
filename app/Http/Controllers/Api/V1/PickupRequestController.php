@@ -202,7 +202,7 @@ class PickupRequestController extends Controller
                         'full_name' => $driver['full_name'],
                         'phone_number' => $driver['phone_number'],
                         'location' => $driver['location'],
-                        'photo' => url('storage/drivers/photos/' . $driver['photo']),
+                        'photo' => url('storage/' . $driver['photo']),
                     ]
                 ]
             ])
