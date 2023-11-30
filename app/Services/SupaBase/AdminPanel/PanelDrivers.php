@@ -26,7 +26,11 @@ class PanelDrivers implements AdminDriversContract
     {
 
         try {
-            $drivers = Collection::make($this->db_instance->join('companies', 'id')->getResult())
+            $query = [
+                'select' => '*',
+                'from'   => 'drivers',
+            ];
+            $drivers = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
                 ->map(function ($item) {
                     $item = (array)$item;
                     $item['company'] = isset($item['companies']) ? $item['companies'] : null;
@@ -39,10 +43,8 @@ class PanelDrivers implements AdminDriversContract
                         $item['last_name'],
                         $item['phone_number'],
                         $item['gender'],
-                        $item['location'],
                         $item['email'],
                         $item['photo'],
-                        $item['messaging_token'],
                         $item['reported_count'],
                         $item['account_status'],
                         $item['registered_at'],
@@ -53,13 +55,15 @@ class PanelDrivers implements AdminDriversContract
                         $item['licence_plate'],
                         $item['is_online'],
                         $item['company'],
-                        $item['can_transport_goods'],
+                        can_transport_goods: $item['can_transport_goods'],
+                        deleted_at: $item['deleted_at'],
+                        province_id: $item['province_id'],
                     );
                 });
 
             return $drivers;
         } catch (Exception $ex) {
-            if($ex->getCode() == 401){
+            if ($ex->getCode() == 401) {
                 authenticate_user();
             }
             return Collection::make([]);
@@ -251,7 +255,7 @@ class PanelDrivers implements AdminDriversContract
                 ->insert($data);
             $driver =  (array)$driver[0];
 
-            // $driver['company'] = $driver['companies'];
+            $driver['company'] = $driver['companies'] ?? null;
             $driver['photo'] = Str::contains($driver['photo'], 'ui-avatars', true) ? $driver['photo'] :
                 url('storage/' . $driver['photo']);
             return new DriverObject(
@@ -261,10 +265,8 @@ class PanelDrivers implements AdminDriversContract
                 $driver['last_name'],
                 $driver['phone_number'],
                 $driver['gender'],
-                $driver['location'],
                 $driver['email'],
                 $driver['photo'],
-                $driver['messaging_token'],
                 $driver['reported_count'],
                 $driver['account_status'],
                 $driver['registered_at'],
@@ -274,9 +276,10 @@ class PanelDrivers implements AdminDriversContract
                 $driver['capacity'],
                 $driver['licence_plate'],
                 $driver['is_online'],
-                $driver['company_id'],
-                $driver['is_default_for_company'],
-                $driver['can_transport_goods'],
+                $driver['company'],
+                can_transport_goods: $driver['can_transport_goods'],
+                deleted_at: $driver['deleted_at'],
+                province_id: $driver['province_id'],
             );
         } catch (Exception $ex) {
             throw $ex;
@@ -286,11 +289,11 @@ class PanelDrivers implements AdminDriversContract
     {
         try {
             $data = array_filter($data, fn ($value) => $value);
-           
+
             $driver = $data = supabase_instance()->initializeDatabase('drivers', 's_id')
                 ->update($s_id, $data);
             $driver =  (array)$driver[0];
-
+            $driver['company'] = $driver['companies'] ?? null;
             $driver['photo'] = Str::contains($driver['photo'], 'ui-avatars', true) ? $driver['photo'] :
                 url('storage/' . $driver['photo']);
             return new DriverObject(
@@ -300,10 +303,8 @@ class PanelDrivers implements AdminDriversContract
                 $driver['last_name'],
                 $driver['phone_number'],
                 $driver['gender'],
-                $driver['location'],
                 $driver['email'],
                 $driver['photo'],
-                $driver['messaging_token'],
                 $driver['reported_count'],
                 $driver['account_status'],
                 $driver['registered_at'],
@@ -313,22 +314,54 @@ class PanelDrivers implements AdminDriversContract
                 $driver['capacity'],
                 $driver['licence_plate'],
                 $driver['is_online'],
-                $driver['company_id'],
-                $driver['is_default_for_company'],
-                $driver['can_transport_goods'],
+                $driver['company'],
+                can_transport_goods: $driver['can_transport_goods'],
+                deleted_at: $driver['deleted_at'],
+                province_id: $driver['province_id'],
             );
         } catch (Exception $ex) {
             throw $ex;
         }
     }
 
-    
-    public function suspend($id): void
+
+    public function suspend(string $s_id): void
     {
-        $this->update($id, ['account_status' => AccountStatus::$SUSPENDED]);
+        try {
+            $this->update($s_id, ['account_status' => AccountStatus::$SUSPENDED]);
+        } catch (Exception $ex) {
+            throw $ex;
+        }
     }
-    public function activateAccount($id): void
+    public function activateAccount($s_id): void
     {
-        $this->update($id, ['account_status' => AccountStatus::$ACTIVE]);
+        try {
+            $this->update($s_id, ['account_status' => AccountStatus::$ACTIVE]);
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
+    public function restore($s_id): void
+    {
+        $data = ['deleted_at' => null];
+        try {
+
+            $driver =  supabase_instance()->initializeDatabase('drivers', 's_id')
+                ->update($s_id, $data);
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
+    public function delete(string $s_id): bool|null
+    {
+        $data = ['deleted_at' => now()];
+        try {
+
+            $driver =  supabase_instance()->initializeDatabase('drivers', 's_id')
+                ->update($s_id, $data);
+            return true;
+        } catch (Exception $ex) {
+            throw $ex;
+        }
     }
 }

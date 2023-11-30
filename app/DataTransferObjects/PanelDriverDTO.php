@@ -13,10 +13,8 @@ class PanelDriverDTO
         public ?string $last_name = null,
         public ?string $phone_number = null,
         public ?string $gender = null,
-        public ?object $location = null,
         public ?string $email = null,
         public ?string $photo = null,
-        public ?string $messaging_token = null,
         public ?int $reported_count = 0,
         public ?string $account_status = null,
         public ?string $registered_at = null,
@@ -30,6 +28,8 @@ class PanelDriverDTO
         public ?bool $is_default_for_company = false,
         public ?bool $can_transport_goods = false,
         public  ?float $rating=0,
+        public  ?string $deleted_at= null,
+        public  ?int $province_id= null,
 
     ) {
         $this->registered_at = (new DateTime($this->registered_at))->format('d-m-Y H:i');

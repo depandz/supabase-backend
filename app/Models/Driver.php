@@ -11,12 +11,14 @@ use Illuminate\Notifications\Notifiable;
 use App\Services\SupaBase\Adminpanel\PanelDrivers;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Driver extends Model
 {
     use HasFactory;
     use HasApiTokens;
     use Notifiable;
+    use SoftDeletes;
     use Sushi;
     /**
      * The attributes that are mass assignable.
@@ -44,6 +46,7 @@ class Driver extends Model
         'company_id',
         'is_default_for_company',
         'can_transport_goods',
+        'deleted_at',
     ];
 
     /**
@@ -102,6 +105,9 @@ class Driver extends Model
             'commercial_register_number',
             'capacity',
             'can_transport_goods',
+            'registered_at',
+            'deleted_at',
+            'province_id',
         ])
         ->all();
             // return [
