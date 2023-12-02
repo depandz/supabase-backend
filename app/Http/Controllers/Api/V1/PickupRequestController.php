@@ -84,7 +84,7 @@ class PickupRequestController extends Controller
                     return [
                         "id" => $driver->id,
                         "s_id" => $driver->s_id,
-                        "full_name" => $driver->full_name,
+                        "full_name" =>  $driver['first_name'].' '. $driver['last_name'],
                         "phone_number" => $driver->phone_number,
                         "location" => $driver->location,
                         "photo" => $driver->photo,
@@ -199,7 +199,7 @@ class PickupRequestController extends Controller
                     'driver' =>
                     [
                         's_id' => $driver['s_id'],
-                        'full_name' => $driver['full_name'],
+                        'full_name' =>  $driver['first_name'].' '. $driver['last_name'],
                         'phone_number' => $driver['phone_number'],
                         'location' => $driver['location'],
                         'photo' => url('storage/drivers/photos/' . $driver['photo']),
