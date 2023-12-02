@@ -306,7 +306,7 @@ class DriverController extends Controller
                         'driver' =>
                         [
                             's_id' => $drivers[0]['s_id'],
-                            'full_name' => $drivers[0]['full_name'],
+                            'full_name' => $drivers[0]['first_name'].' '.$drivers[0]['last_name'],
                             'phone_number' => $drivers[0]['phone_number'],
                             'location' => $drivers[0]['location'],
                             'photo' => url('storage/drivers/photos/' . $drivers[0]['photo']),
