@@ -202,8 +202,8 @@ class PickupRequestController extends Controller
                         'full_name' =>  $driver['first_name'].' '. $driver['last_name'],
                         'phone_number' => $driver['phone_number'],
                         'location' => $driver['location'],
-                        'photo' => url('storage/' . $driver['photo']),
-                    ] 
+                        'photo' => url('storage/drivers/photos/' . $driver['photo']),
+                    ]
                 ]
             ])
             ->message('Pickup request confirmed successfully')

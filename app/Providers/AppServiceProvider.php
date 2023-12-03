@@ -12,7 +12,7 @@ use App\Services\SupaBase\Client;
 use App\Services\SupaBase\Driver;
 use App\Services\SupaBase\Fees;
 use App\Services\SupaBase\PickupRequest;
-use App\Services\SupaBase\Province;
+use App\Services\Locale\Province;
 use Illuminate\Support\ServiceProvider;
 
 class AppServiceProvider extends ServiceProvider
