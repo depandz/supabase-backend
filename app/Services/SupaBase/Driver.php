@@ -31,7 +31,7 @@ class Driver implements DriverContract
                 $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                 $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
-                $item['full_name']  = $item['first_name']+' '.$item['last_name'];
+                $item['full_name']  = $item['first_name'].' '.$item['last_name'];
                 return new DriverObject(
                     $item['id'], $item['s_id'],
                     $item['full_name'],
@@ -93,7 +93,7 @@ class Driver implements DriverContract
                 }
                 
                 $rating_final = $rating_count > 0  ? (round(($rating_sum / $rating_count) *2) /2) : 0;
-                $item['full_name']  = $item['first_name']+' '.$item['last_name'];
+                $item['full_name']  = $item['first_name'].' '.$item['last_name'];
                 return new DriverObject(
                     $item['id'], $item['s_id'], 
                     $item['full_name'],
@@ -146,7 +146,7 @@ class Driver implements DriverContract
                                         $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                                         $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
-                                        $item['full_name']  = $item['first_name']+' '.$item['last_name'];
+                                        $item['full_name']  = $item['first_name'].' '.$item['last_name'];
                                         return new DriverObject(
                                             $item['id'], $item['s_id'], 
                                             $item['full_name'],
@@ -199,7 +199,7 @@ class Driver implements DriverContract
                     $item['company'] = $item['companies'];
                     $item['photo'] = Str::contains($item['photo'],'ui-avatars',true) ? $item['photo'] :
                                                     url('storage/'.$item['photo']);
-                    $item['full_name']  = $item['first_name']+' '.$item['last_name'];
+                    $item['full_name']  = $item['first_name'].' '.$item['last_name'];
                     return new DriverObject(
                         $item['id'], $item['s_id'], 
                         $item['full_name'],
@@ -260,7 +260,7 @@ class Driver implements DriverContract
             $driver['company'] = $driver['companies'];
             $driver['photo'] = Str::contains($driver['photo'],'ui-avatars',true) ? $driver['photo'] :
                                                     url('storage/'.$driver['photo']);
-            $item['full_name']  = $item['first_name']+' '.$item['last_name'];
+            $item['full_name']  = $item['first_name'].' '.$item['last_name'];
                 return new DriverObject(
                     $driver['id'],
                     $driver['s_id'],
