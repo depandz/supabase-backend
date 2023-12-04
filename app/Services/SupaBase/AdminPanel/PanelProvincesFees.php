@@ -21,6 +21,7 @@ class PanelProvincesFees implements FeesContract
         $fee = (array)$this->db_instance->insert($data)[0];
         
         return new FeeObject(
+            $fee['id'],
             $fee['province_id'],
             $fee['heavy'],
             $fee['light'],
@@ -34,6 +35,7 @@ class PanelProvincesFees implements FeesContract
         $fee = (array)$this->db_instance->update('id',$data)[0];
         
         return new FeeObject(
+            $fee['id'],
             $fee['province_id'],
             $fee['heavy'],
             $fee['light'],
@@ -51,6 +53,7 @@ class PanelProvincesFees implements FeesContract
         ];
         $fees = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
                             ->map(fn ($item) =>  new FeeObject(
+                                $item->id,
                                 $item->province_id,
                                 $item->heavy,
                                 $item->light,
@@ -86,6 +89,7 @@ class PanelProvincesFees implements FeesContract
             ];
           $fee = Collection::make($this->db_instance->createCustomQuery($query)->findBy($column, $value)->getResult())
                             ->map(fn ($item) =>  new FeeObject(
+                                $item->id,
                                 $item->province_id,
                                 $item->heavy,
                                 $item->light,
@@ -109,6 +113,7 @@ class PanelProvincesFees implements FeesContract
                 'from'   => 'fees',
             ];
             $fees = Collection::make($this->db_instance->createCustomQuery($query)->findByLike($column, $value)->getResult())->map(fn ($item) => new FeeObject(
+                $item->id,
                 $item->province_id,
                 $item->heavy,
                 $item->light,
@@ -135,6 +140,7 @@ class PanelProvincesFees implements FeesContract
                     ]
                 ];
                 $fees = Collection::make($this->db_instance->createCustomQuery($query)->findByLike($column, $value)->getResult())->map(fn ($item) => new FeeObject(
+                    $item->id,
                     $item->province_id,
                     $item->heavy,
                     $item->light,

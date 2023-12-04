@@ -2,16 +2,17 @@
 
 namespace App\Filament\Resources;
 
-use App\Filament\Resources\FeeResource\Pages;
-use App\Filament\Resources\FeeResource\RelationManagers;
 use App\Models\Fee;
 use Filament\Forms;
-use Filament\Forms\Form;
-use Filament\Resources\Resource;
 use Filament\Tables;
+use App\Models\Province;
+use Filament\Forms\Form;
 use Filament\Tables\Table;
+use Filament\Resources\Resource;
 use Illuminate\Database\Eloquent\Builder;
+use App\Filament\Resources\FeeResource\Pages;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
+use App\Filament\Resources\FeeResource\RelationManagers;
 
 class FeeResource extends Resource
 {
@@ -40,9 +41,13 @@ class FeeResource extends Resource
     {
         return $table
             ->columns([
+                Tables\Columns\TextColumn::make('id')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('province_id')
                     ->numeric()
-                    ->sortable(),
+                    ->sortable()
+                    ->tooltip(fn (Fee $record): string => Province::whereCode($record->province_id)->first()?->name ?? ''),
                 Tables\Columns\TextColumn::make('heavy')
                     ->numeric()
                     ->sortable(),

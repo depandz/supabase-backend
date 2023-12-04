@@ -7,6 +7,7 @@ class PanelFeesDTO
    
 
     public function __construct(
+        public ?int $id,
         public ?int $province_id,
         public ?float $heavy,
         public ?float $light,
@@ -16,6 +17,7 @@ class PanelFeesDTO
     ){}
     public function asArray(){
         return [
+            'id'=>$this->id,
             'province_id'=>$this->province_id,
             'heavy'=>$this->heavy,
             'light'=>$this->light,
