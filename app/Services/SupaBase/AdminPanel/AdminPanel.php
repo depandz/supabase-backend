@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Services\SupaBase\Adminpanel;
+namespace App\Services\SupaBase\AdminPanel;
 
 use Exception;
 use Carbon\Carbon;

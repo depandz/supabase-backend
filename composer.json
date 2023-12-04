@@ -10,6 +10,7 @@
         "calebporzio/sushi": "^2.4",
         "darkaonline/l5-swagger": "^8.5",
         "filament/filament": "3.0-stable",
+        "filament/spatie-laravel-settings-plugin": "3.0-stable",
         "guzzlehttp/guzzle": "^7.2",
         "laravel/framework": "^10.10",
         "laravel/sanctum": "^3.2",

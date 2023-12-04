@@ -191,12 +191,12 @@ class Client implements ClientContract
 
     public function updatePhoto($s_id, $photo): string
     {
-        $old_photo =null;
         $new_photo =null;
+        $client =  $this->findBy('s_id', $s_id);
 
         try {
 
-            $client =  $this->findBy('s_id', $s_id);
+            
 
             if(isset($photo)) {
                 if(isset($client) && $client[0] && file_exists($client[0]->photo)) {
@@ -207,12 +207,16 @@ class Client implements ClientContract
                     "clients/photos",  
                     ['disk' => 'public']
                 );
+                 $clients = supabase_instance()->initializeDatabase('clients', 's_id')->update($s_id,array('photo'=>$new_photo = $new_photo));
+                 return url('storage/'.$clients[0]?->photo) ?? '';
             }
-            $this->update($s_id, array('photo'=>$new_photo));
-            return $new_photo;
+           return $client[0]?->photo ?? '';
+            // $this->update($s_id, array('photo'=>$new_photo));
+       
+            
         }
         catch(Exception $ex){
-            $this->update($s_id, array('photo'=>$old_photo));
+            $this->update($s_id, array('photo'=> GlobalVars::getDefaultProfilePicture($client[0]?->first_name ?? 'Test Name')));
             throw $ex;
         }
     }

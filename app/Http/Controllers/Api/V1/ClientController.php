@@ -275,7 +275,7 @@ class ClientController extends Controller
             try
             {
                 $this->validate($request,[
-                    'photo' => 'sometimes|nullable|string|image|mimes:jpg,jpeg,webp,bmp,png,gif,svg',
+                    'photo' => 'sometimes|nullable|image|mimes:jpg,jpeg,webp,bmp,png,gif,svg',
                 ]);
 
                 $client = $this->client_contract->updatePhoto($s_id,$request->photo);

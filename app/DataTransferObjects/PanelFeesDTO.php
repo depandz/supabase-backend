@@ -2,7 +2,7 @@
 
 namespace App\DataTransferObjects;
 
-class FeesDTO
+class PanelFeesDTO
 {
    
 
@@ -12,6 +12,7 @@ class FeesDTO
         public ?float $light,
         public ?float $truck,
         public ?int $full_percentage,
+        public ?string $deleted_at = null,
     ){}
     public function asArray(){
         return [
@@ -20,6 +21,7 @@ class FeesDTO
             'light'=>$this->light,
             'truck'=>$this->truck,
             'full_percentage'=>$this->full_percentage,
+            'deleted_at'=>$this->deleted_at,
         ];
     }
 

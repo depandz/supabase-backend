@@ -73,6 +73,7 @@ return [
         public_path('storage') => storage_path('app/public'),
         public_path('storage/drivers') => storage_path('app/public/drivers'),
         public_path('storage/clients') => storage_path('app/public/clients'),
+        public_path('storage/settings') => storage_path('app/public/settings'),
     ],
 
 ];

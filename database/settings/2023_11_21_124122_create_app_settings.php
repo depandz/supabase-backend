@@ -7,7 +7,7 @@ return new class extends SettingsMigration
     public function up(): void
     {
         $this->migrator->add('general.app_name', 'Depanini');
-        $this->migrator->add('general.app_logo','/settings/logo.png');
+        $this->migrator->add('general.app_logo','settings/logo.png');
         $this->migrator->add('general.app_slogon','Save Time');
         $this->migrator->add('general.app_description',' Depanini is an intellectual instant portal relying on internet technology, and Locations services in connecting customers who need transportation services, and road side assistance with qualified service providers');
         $this->migrator->add('general.contact_mail','depaninidz@gmail.com');
