@@ -32,7 +32,7 @@ class PanelProvincesFees implements FeesContract
     }
     public function update($id,$data):FeeObject
     {
-        $fee = (array)$this->db_instance->update('id',$data)[0];
+        $fee = (array)$this->db_instance->update($id,$data)[0];
         
         return new FeeObject(
             $fee['id'],

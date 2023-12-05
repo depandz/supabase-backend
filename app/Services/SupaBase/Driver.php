@@ -260,7 +260,7 @@ class Driver implements DriverContract
             $driver['company'] = $driver['companies'];
             $driver['photo'] = Str::contains($driver['photo'],'ui-avatars',true) ? $driver['photo'] :
                                                     url('storage/'.$driver['photo']);
-            $item['full_name']  = $item['first_name'].' '.$item['last_name'];
+            $item['full_name']  = $driver['first_name'].' '.$driver['last_name'];
                 return new DriverObject(
                     $driver['id'],
                     $driver['s_id'],

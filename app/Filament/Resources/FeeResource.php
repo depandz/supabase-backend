@@ -25,14 +25,16 @@ class FeeResource extends Resource
         return $form
             ->schema([
                 Forms\Components\Select::make('province_id')
-                    ->relationship('province', 'name'),
-                Forms\Components\TextInput::make('heavy')
+                    ->options(Province::orderBy('code','asc')->pluck('name','code'))
+                    ->searchable()
+                    ->default(fn (Fee $record): string => Province::whereCode($record->province_id)->first()?->name ?? ''),
+                Forms\Components\TextInput::make('heavy')->label('Heavy Price')
                     ->numeric(),
-                Forms\Components\TextInput::make('light')
+                Forms\Components\TextInput::make('light')->label('Light Price')
                     ->numeric(),
-                Forms\Components\TextInput::make('truck')
+                Forms\Components\TextInput::make('truck')->label('Truck Price')
                     ->numeric(),
-                Forms\Components\TextInput::make('full_percentage')
+                Forms\Components\TextInput::make('full_percentage')->hint('When it is full, add a percentage to the price')
                     ->numeric(),
             ]);
     }
@@ -65,11 +67,11 @@ class FeeResource extends Resource
                 //
             ])
             ->actions([
-                Tables\Actions\EditAction::make(),
+                Tables\Actions\EditAction::make()->successNotification(null),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    // Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ])
             ->emptyStateActions([

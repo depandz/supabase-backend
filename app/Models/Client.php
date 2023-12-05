@@ -47,7 +47,7 @@ class Client extends Model
         'photo' => 'integer',
         'registered_at' => 'datetime',
     ];
-        /**
+    /**
      * Model Rows
      *
      * @return void

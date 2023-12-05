@@ -20,8 +20,8 @@ class CreateFee extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
 
-        $driver = $this->service->insert($data);
-        if($driver){
+        $fee = $this->service->insert($data);
+        if($fee){
             Notification::make()
             ->title('Province Fee Created successfully')
             ->success()

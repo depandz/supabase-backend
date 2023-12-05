@@ -16,7 +16,7 @@ class PanelClientDTO
         public ?string $last_name=null,
         public ?string $phone_number=null,
         public ?string $gender=null,
-        public ?string $email=null,
+        public ?string $email=null, 
         public ?string $photo=null,
         public ?int $reported_count=null,
         public ?string $account_status=null,

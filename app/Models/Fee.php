@@ -2,12 +2,13 @@
 
 namespace App\Models;
 
-use App\Services\SupaBase\AdminPanel\PanelProvincesFees;
-use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\Relations\BelongsTo;
-use Illuminate\Database\Eloquent\SoftDeletes;
 use Sushi\Sushi;
+use App\Models\Province;
+use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
+use App\Services\SupaBase\AdminPanel\PanelProvincesFees;
 
 class Fee extends Model
 {
