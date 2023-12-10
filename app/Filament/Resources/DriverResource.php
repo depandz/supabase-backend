@@ -21,7 +21,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Tables\Columns\AccountStatusColumn;
 use App\Filament\Resources\DriverResource\Pages;
-use App\Services\SupaBase\Adminpanel\PanelDrivers;
+use App\Services\SupaBase\AdminPanel\PanelDrivers;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\DriverResource\RelationManagers;
 

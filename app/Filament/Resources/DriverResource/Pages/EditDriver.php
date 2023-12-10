@@ -10,7 +10,7 @@ use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use Filament\Tables\Actions\ActionGroup;
 use App\Filament\Resources\DriverResource;
-use App\Services\SupaBase\Adminpanel\PanelDrivers;
+use App\Services\SupaBase\AdminPanel\PanelDrivers;
 
 class EditDriver extends EditRecord
 {
@@ -101,5 +101,5 @@ class EditDriver extends EditRecord
 
         return [];
     }
-    
+
 }

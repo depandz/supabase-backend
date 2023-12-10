@@ -6,7 +6,7 @@ use Filament\Actions;
 use Filament\Notifications\Notification;
 use App\Filament\Resources\DriverResource;
 use Filament\Resources\Pages\CreateRecord;
-use App\Services\SupaBase\Adminpanel\PanelDrivers;
+use App\Services\SupaBase\AdminPanel\PanelDrivers;
 
 class CreateDriver extends CreateRecord
 {

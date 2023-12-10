@@ -27,7 +27,7 @@ class FeeResource extends Resource
                 Forms\Components\Select::make('province_id')
                     ->options(Province::orderBy('code','asc')->pluck('name','code'))
                     ->searchable()
-                    ->default(fn (Fee $record): string => Province::whereCode($record->province_id)->first()?->name ?? ''),
+                    ->default(fn (?Fee $record): string => Province::whereCode($record?->province_id)->first()?->name ?? ''),
                 Forms\Components\TextInput::make('heavy')->label('Heavy Price')
                     ->numeric(),
                 Forms\Components\TextInput::make('light')->label('Light Price')
@@ -78,14 +78,14 @@ class FeeResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -93,5 +93,5 @@ class FeeResource extends Resource
             'create' => Pages\CreateFee::route('/create'),
             'edit' => Pages\EditFee::route('/{record}/edit'),
         ];
-    }    
+    }
 }

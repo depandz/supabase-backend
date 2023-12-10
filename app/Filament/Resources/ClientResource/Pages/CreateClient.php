@@ -6,7 +6,7 @@ use Filament\Actions;
 use Filament\Notifications\Notification;
 use App\Filament\Resources\ClientResource;
 use Filament\Resources\Pages\CreateRecord;
-use App\Services\SupaBase\Adminpanel\PanelClients;
+use App\Services\SupaBase\AdminPanel\PanelClients;
 
 class CreateClient extends CreateRecord
 {

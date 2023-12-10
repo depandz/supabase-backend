@@ -9,9 +9,9 @@ use Filament\Tables\Columns\TextColumn;
 use Filament\Forms\Components\TextInput;
 use Filament\Tables\Actions\CreateAction;
 use Filament\Tables\Concerns\InteractsWithTable;
-use App\Services\SupaBase\Adminpanel\PanelDrivers;
+use App\Services\SupaBase\AdminPanel\PanelDrivers;
 
-class AppDrivers extends Page 
+class AppDrivers extends Page
 {
     use InteractsWithTable;
     protected static ?string $navigationIcon ='icon-driver';
@@ -33,5 +33,5 @@ class AppDrivers extends Page
         'drivers'=>$drivers
        ];
     }
-  
+
 }

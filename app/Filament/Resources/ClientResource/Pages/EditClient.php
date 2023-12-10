@@ -9,7 +9,7 @@ use App\Enums\AccountStatus;
 use Filament\Notifications\Notification;
 use Filament\Resources\Pages\EditRecord;
 use App\Filament\Resources\ClientResource;
-use App\Services\SupaBase\Adminpanel\PanelClients;
+use App\Services\SupaBase\AdminPanel\PanelClients;
 
 class EditClient extends EditRecord
 {

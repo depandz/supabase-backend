@@ -17,7 +17,7 @@ use Filament\Tables\Filters\SelectFilter;
 use Illuminate\Database\Eloquent\Builder;
 use App\Tables\Columns\AccountStatusColumn;
 use App\Filament\Resources\ClientResource\Pages;
-use App\Services\SupaBase\Adminpanel\PanelClients;
+use App\Services\SupaBase\AdminPanel\PanelClients;
 use Illuminate\Database\Eloquent\SoftDeletingScope;
 use App\Filament\Resources\ClientResource\RelationManagers;
 
@@ -156,14 +156,14 @@ class ClientResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -172,5 +172,5 @@ class ClientResource extends Resource
             'edit' => Pages\EditClient::route('/{record}/edit'),
             'view' => Pages\ViewClient::route('/{record}'),
         ];
-    }    
+    }
 }
