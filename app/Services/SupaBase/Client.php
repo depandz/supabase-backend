@@ -22,7 +22,7 @@ class Client implements ClientContract
 
     public function fetchAll(): Collection
     {
-        
+
         $clients = Collection::make($this->db_instance->fetchAll()->getResult())
                                 ->map(function ($item) {
                                     $item = (array) $item;
@@ -50,7 +50,7 @@ class Client implements ClientContract
 
     public function findByLike($column, $value): Collection
     {
-         
+
         try {
             $clients = Collection::make($this->db_instance
                                     ->findByLike($column, $value)
@@ -84,7 +84,7 @@ class Client implements ClientContract
     }
     public function findBy($column, $value): Collection
     {
-         
+
         try {
             $clients = Collection::make($this->db_instance
                                     ->findBy($column, $value)
@@ -125,11 +125,11 @@ class Client implements ClientContract
             $data['photo'] = GlobalVars::getDefaultProfilePicture($data['first_name']);
 
             $client = (array)$this->db_instance->insert($data)[0];
-            
+
             $client['photo'] = Str::contains($client['photo'],'ui-avatars',true)
              ? $client['photo'] :
             url('storage/'.$client['photo']);
-            
+
             return new ClientObject(
                 $client['id'],
                 $client['s_id'],
@@ -162,7 +162,7 @@ class Client implements ClientContract
             if(array_key_exists('location',$data)){
                 $data['location'] = json_encode($data['location']);
             }
-            $client = $data = supabase_instance()->initializeDatabase('clients', 's_id')->update($s_id,$data);
+            $client  = supabase_instance()->initializeDatabase('clients', 's_id')->update($s_id,$data);
             $client =  (array)$client[0];
 
             $client['photo'] = Str::contains($client['photo'],'ui-avatars',true) ? $client['photo'] :
@@ -196,7 +196,7 @@ class Client implements ClientContract
 
         try {
 
-            
+
 
             if(isset($photo)) {
                 if(isset($client) && $client[0] && file_exists($client[0]->photo)) {
@@ -204,7 +204,7 @@ class Client implements ClientContract
                     unlink($client[0]->photo);
                 };
                 $new_photo = $photo->storePublicly(
-                    "clients/photos",  
+                    "clients/photos",
                     ['disk' => 'public']
                 );
                  $clients = supabase_instance()->initializeDatabase('clients', 's_id')->update($s_id,array('photo'=>$new_photo = $new_photo));
@@ -212,8 +212,8 @@ class Client implements ClientContract
             }
            return $client[0]?->photo ?? '';
             // $this->update($s_id, array('photo'=>$new_photo));
-       
-            
+
+
         }
         catch(Exception $ex){
             $this->update($s_id, array('photo'=> GlobalVars::getDefaultProfilePicture($client[0]?->first_name ?? 'Test Name')));
