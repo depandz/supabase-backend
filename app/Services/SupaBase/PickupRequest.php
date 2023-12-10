@@ -282,17 +282,20 @@ class PickupRequest implements PickupRequestContract
                 'where' =>
                 [
                     $type . '_id' => 'eq.' . $id,
-                    'status' => 'eq.validated',
+                    'status' => 'not.eq.pending',
                     // 'status' => 'eq.'.PickupRequestStatus::APPROVED->value,
                 ],
                 'order' => 'date_requested.desc'
             ];
             $pickups = Collection::make([]);
             $pickup_requests = Collection::make($this->db_instance->createCustomQuery($query)->getResult());
-            $pickups['history'] = $pickup_requests->filter(fn ($item) => !$item->due_date);
-            $pickups['upcoming'] = $pickup_requests->filter(fn ($item) => $item->due_date);
+            $pickups = $pickup_requests->filter(fn ($item) => !in_array(!$item->status,['cancelled','approved']));
 
-            return $pickups;
+            $result = Collection::make([]);
+            $result['history'] = ($pickups->filter(fn ($item) => !$item->due_date))->values();
+            $result['upcoming'] = ($pickups->filter(fn ($item) => $item->due_date))->values();
+
+            return $result;
         } catch (Exception $ex) {
             throw $ex;
         }
