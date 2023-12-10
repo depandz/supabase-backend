@@ -54,7 +54,7 @@ class Fee extends Model
     {
         //API
         $drivers = (new PanelProvincesFees())->fetchAll();
- 
+
         //filtering some attributes
         $drivers = $drivers->map(function ($item) {
             return collect((array)$item)->all();

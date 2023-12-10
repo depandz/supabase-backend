@@ -7,7 +7,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Database\Eloquent\SoftDeletes;
-use App\Services\SupaBase\Adminpanel\PanelClients;
+use App\Services\SupaBase\AdminPanel\PanelClients;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 
 class Client extends Model
@@ -56,7 +56,7 @@ class Client extends Model
     {
         //API
         $drivers = (new PanelClients())->fetchAll();
- 
+
         //filtering some attributes
         $drivers = $drivers->map(function ($item) {
             return collect((array)$item)

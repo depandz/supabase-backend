@@ -8,7 +8,7 @@ use Laravel\Sanctum\HasApiTokens;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Notifications\Notifiable;
-use App\Services\SupaBase\Adminpanel\PanelDrivers;
+use App\Services\SupaBase\AdminPanel\PanelDrivers;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\SoftDeletes;
@@ -84,7 +84,7 @@ class Driver extends Model
     {
         //API
         $drivers = (new PanelDrivers())->fetchAll();
- 
+
         //filtering some attributes
         $drivers = $drivers->map(function ($item) {
             return collect((array)$item)
@@ -130,5 +130,5 @@ class Driver extends Model
 
         return $drivers->toArray();
     }
-    
+
 }
