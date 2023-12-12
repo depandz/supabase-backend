@@ -185,7 +185,7 @@ class DriverController extends Controller
     {
         try {
             $this->validate($request, [
-                'photo' => 'sometimes|nullable|string|image|mimes:jpg,jpeg,webp,bmp,png,gif,svg',
+                'photo' => 'sometimes|nullable|image|mimes:jpg,jpeg,webp,bmp,png,gif,svg',
             ]);
 
             $driver = $this->driver_contract->updatePhoto($s_id, $request->photo);
@@ -259,16 +259,16 @@ class DriverController extends Controller
         if ($action == "decline") {
             $exists = false;
             foreach ($drivers as $key => $driver) {
-                
+
                 if ($driver['s_id'] == $s_id) {
                     $exists = true;
                     unset($drivers[$key]);
                     break;
                 }
-                
+
             }
             if(!$exists) {
-             
+
                 return  $this->api_responser
                 ->failed()
                 ->code(403)
@@ -315,18 +315,18 @@ class DriverController extends Controller
                 ])
                 ->message('Pickup request declined successfully')
                 ->send();
-        } 
+        }
         else {
             $exists = null;
             foreach ($drivers as $key => $driver) {
-                
+
                 if ($driver['s_id'] == $s_id) {
                     $exists = $driver;
                     break;
                 }
-                
+
             }
-    
+
             if(!$exists) $driver= firstOf($this->driver_contract->findBy('s_id',$s_id));
             if(!$driver){
                 return  $this->api_responser
@@ -335,8 +335,8 @@ class DriverController extends Controller
                 ->message('You are not authorized to do deal with this pickup request')
                 ->send();
             }
-          
-            $pickup_request = $this->pickup_request_contract->approve($pickup_sid,$driver['id']);  
+
+            $pickup_request = $this->pickup_request_contract->approve($pickup_sid,$driver['id']);
 
             event(new PickupRequestApproved($pickup_request,$driver));
 
@@ -347,4 +347,45 @@ class DriverController extends Controller
                 ->send();
         }
     }
+     /**
+        * @OA\Put(
+        * path="/api/v1/drivers/{s_id}/switch-online-status",
+        * operationId="switch-online-status for a driver",
+        * tags={"drivers"},
+        * summary="switch-online-status for a driver",
+        * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+        *     @OA\RequestBody(
+        *         @OA\JsonContent(),
+        *         @OA\MediaType(
+        *            mediaType="application/x-www-form-urlencoded",
+        *             @OA\Schema(
+        *                 @OA\Property(property="status",type="boolean",enum={0,1}),
+        *             )),
+        *    ),
+        *    @OA\Response( response=200, description="online status switched successfully", @OA\JsonContent() ),
+        *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+        *     )
+        */
+        public function switchOnlineStatus(Request $request, $s_id)
+        {
+            try{
+                $this->validate($request,[
+                    'status'=>'required|boolean|in:0,1'
+                ]);
+                $driver = $this->driver_contract->switchOnlineStatus($s_id,$request->status);
+
+                return $this->api_responser
+                    ->success()
+                    ->message('online status switched successfully')
+                    ->payload($driver)
+                    ->send();
+            }
+            catch(Exception $ex){
+
+                return $this->api_responser
+                    ->failed($ex->getCode())
+                    ->message($ex->getMessage())
+                    ->send();
+            }
+        }
 }

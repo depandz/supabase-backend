@@ -19,4 +19,6 @@ interface DriverContract extends SupaBaseContract
     public function activateAccount(int $id): void;
 
     public function findByProvince(int $province_id): Collection;
+
+    public function switchOnlineStatus(string $s_id, bool $status): bool|null;
 }

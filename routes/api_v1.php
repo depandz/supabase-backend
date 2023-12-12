@@ -26,7 +26,7 @@ Route::group(['as' => 'api_v1.'], function () {
     Route::get('provinces/find-by-code/{code}', [ProvinceController::class, 'findByCode']);
     Route::post('otp/send',[AuthController::class, 'sendOtp']);
     Route::post('otp/verify',[AuthController::class, 'verifyOtp']);
-    //clients 
+    //clients
     Route::controller(ClientController::class)->prefix('clients')->group(function(){
         // Route::post('otp/send','sendOtp');
         // Route::post('otp/verify','sendOtp');
@@ -38,13 +38,16 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::post('{s_id}/update-photo','updatePhoto');
         Route::get('{s_id}/pickups-history','pickupsHistory');
     });
-    //driver 
+    //driver
     Route::controller(DriverController::class)->prefix('drivers')->group(function(){
         Route::get('/','index');
         Route::post('/login','login');
         Route::get('{s_id}','show');
         Route::put('{s_id}/update','update');
+        Route::post('{s_id}/update-photo','updatePhoto');
         Route::post('{s_id}/pickup-requests/{pickup_sid}/{action}','AcceptDeclinePickupRequest');
+        Route::put('{s_id}/switch-online-status','switchOnlineStatus');
+
     });
     Route::controller(PickupRequestController::class)->prefix('pickup-requests')->group(function(){
         Route::post('/initialize','initialize');

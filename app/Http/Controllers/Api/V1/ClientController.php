@@ -14,7 +14,7 @@ use App\Models\Client;
 
 class ClientController extends Controller
 {
-     
+
 
         public $client_contract;
         public $pickup;
@@ -41,9 +41,9 @@ class ClientController extends Controller
                     ->message('clients fetched successfully')
                     ->payload($clients)
                     ->send();
-            } 
+            }
             catch(Exception $ex){
-                
+
                 return $this->api_responser
                     ->failed($ex->getCode())
                     ->message($ex->getMessage())
@@ -76,7 +76,7 @@ class ClientController extends Controller
                     ->send();
             }
             catch(Exception $ex){
-                
+
                 return $this->api_responser
                     ->failed($ex->getCode())
                     ->message($ex->getMessage())
@@ -109,7 +109,7 @@ class ClientController extends Controller
         {
             try {
                 $clients = $this->client_contract->findBy('phone_number', ltrim($request['phone_number'],'+'));
-  
+
                 $client = firstOf($clients);
                 //unset unwanted data
                 $data =$request->validated();
@@ -145,15 +145,15 @@ class ClientController extends Controller
                     ->send();
             }
             catch(Exception $ex){
-                
+
                 return $this->api_responser
                     ->failed($ex->getCode())
                     ->message($ex->getMessage())
                     ->send();
             }
         }
-    
-   
+
+
         // /**
         // * @OA\Post(
         // * path="/api/v1/clients/login",
@@ -172,7 +172,7 @@ class ClientController extends Controller
         // *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
         // *     )
         // */
-        
+
         // public function login(Request $request)
         // {
         //     try {
@@ -180,7 +180,7 @@ class ClientController extends Controller
         //             'phone_number' => 'required|regex:/^\+213[567]\d{8}$/',
         //         ]);
         //         $validated['phone_number'] = ltrim($validated['phone_number'], '+');
-        
+
         //         $clients = $this->client_contract->findBy('phone_number',$validated['phone_number']);
 
         //         if($clients && count($clients))
@@ -201,7 +201,7 @@ class ClientController extends Controller
 
         //     }
         //     catch(Exception $ex){
-                
+
         //         return $this->api_responser
         //             ->failed($ex->getCode())
         //             ->message($ex->getMessage())
@@ -244,7 +244,7 @@ class ClientController extends Controller
                     ->send();
             }
             catch(Exception $ex){
-                
+
                 return $this->api_responser
                     ->failed($ex->getCode())
                     ->message($ex->getMessage())
@@ -287,13 +287,13 @@ class ClientController extends Controller
                     ->send();
             }
             catch(Exception $ex){
-                
+
                 return $this->api_responser
                     ->failed($ex->getCode())
                     ->message($ex->getMessage())
                     ->send();
             }
-     
+
         }
           /**
         * @OA\Get(
@@ -328,11 +328,11 @@ class ClientController extends Controller
                     ->send();
             }
             catch(Exception $ex){
-                
+
                 return $this->api_responser
                     ->failed($ex->getCode())
                     ->message($ex->getMessage())
                     ->send();
-            } 
+            }
         }
 }
