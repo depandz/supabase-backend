@@ -18,6 +18,8 @@ interface PickupRequestContract extends SupaBaseContract
 
     public function approve(string $s_id, int $driver): PickupRequest|null;
 
+    public function finish(string $s_id, $date_finished): bool|null;
+
     public function cancel(string $s_id, $date_cancelled): bool |null;
 
     public function history(int $id,string $type): Collection |null;

@@ -971,6 +971,68 @@
                 }
             }
         },
+        "/api/v1/pickup-requests/{s_id}/finish": {
+            "post": {
+                "tags": [
+                    "pickup_requests"
+                ],
+                "summary": "finish pickup request ",
+                "operationId": "finish_pickup_request",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "Pickup request secret id ",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "date_finish": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "17-09-2023 15:22"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Pickup request finished successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No pickup request exists with the given id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pickup-requests/{s_id}/cancel": {
             "post": {
                 "tags": [

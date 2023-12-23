@@ -261,6 +261,18 @@ class PickupRequest implements PickupRequestContract
             throw $ex;
         }
     }
+    public function finish(string $s_id,$date_finished): bool | null
+    {
+        try {
+            $data = [
+                'updated_at' => Date::createFromTimeString($date_finished),
+                'status' => PickupRequestStatus::VALIDATED->value,
+            ];
+            return $this->update($s_id, $data) ? true : false;
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
     public function cancel(string $s_id, $date_cancelled): bool | null
     {
         try {

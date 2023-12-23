@@ -14,7 +14,7 @@ use App\Http\Controllers\Controller;
 use App\Pipes\PickupPriceCalculator;
 use Illuminate\Support\Facades\Date;
 use App\Http\Requests\AddRatingRequest;
-use App\Contracts\PickUpRequestContract;
+use App\Contracts\PickupRequestContract;
 use App\DataTransferObjects\PositionDTO;
 use App\Events\StartPickupRequestCalling;
 use App\Http\Requests\CancelPickupRequest;
@@ -29,7 +29,7 @@ class PickupRequestController extends Controller
     protected $pickup_request_contract;
     protected $pipeline;
 
-    public function __construct(PickUpRequestContract $pickup_request_contract, Pipeline $pipeline)
+    public function __construct(PickupRequestContract $pickup_request_contract, Pipeline $pipeline)
     {
         parent::__construct();
         $this->pickup_request_contract = $pickup_request_contract;
@@ -65,52 +65,52 @@ class PickupRequestController extends Controller
      */
     public function initialize(InitializePickupRequest $request)
     {
-        try{
-        $data = $request->all();
-        //check client exists
-        $client = checkClientExists($request->client_id);
-        $result = $this->pipeline
-            ->send((array)$data)
-            ->through([
-                ProvinceDataFetcher::class,
-                FetchDriversList::class,
-                DriversDistanceFromClientCalculator::class,
-                PickupPriceCalculator::class
-            ])
-            // ->thenReturn();
-            ->then(function (array $data) {
-                $pickup_request = $this->store($data);
-                $pickup_request->drivers = collect($data['available_drivers'])->map(function ($driver) {
-                    return [
-                        "id" => $driver->id,
-                        "s_id" => $driver->s_id,
-                        "full_name" =>  $driver->full_name,
-                        "phone_number" => $driver->phone_number,
-                        "location" => $driver->location,
-                        "photo" => $driver->photo,
-                        "reported_count" => $driver->reported_count,
-                        "capacity" => $driver->capacity,
-                        "rating" => $driver->rating
-                    ];
+        try {
+            $data = $request->all();
+            //check client exists
+            $client = checkClientExists($request->client_id);
+            $result = $this->pipeline
+                ->send((array)$data)
+                ->through([
+                    ProvinceDataFetcher::class,
+                    FetchDriversList::class,
+                    DriversDistanceFromClientCalculator::class,
+                    PickupPriceCalculator::class
+                ])
+                // ->thenReturn();
+                ->then(function (array $data) {
+                    $pickup_request = $this->store($data);
+                    $pickup_request->drivers = collect($data['available_drivers'])->map(function ($driver) {
+                        return [
+                            "id" => $driver->id,
+                            "s_id" => $driver->s_id,
+                            "full_name" =>  $driver->full_name,
+                            "phone_number" => $driver->phone_number,
+                            "location" => $driver->location,
+                            "photo" => $driver->photo,
+                            "reported_count" => $driver->reported_count,
+                            "capacity" => $driver->capacity,
+                            "rating" => $driver->rating
+                        ];
+                    });
+                    return $pickup_request;
+                    // return $this->api_responser
+                    // ->success()
+                    // ->message('Pickup request initialized successfully')
+                    // ->payload(
+                    //     [
+                    //         'pickup_request'=>$pickup_request,
+                    //     ]
+                    // )
+                    // ->send();
                 });
-                return $pickup_request;
-                // return $this->api_responser
-                // ->success()
-                // ->message('Pickup request initialized successfully')
-                // ->payload(
-                //     [
-                //         'pickup_request'=>$pickup_request,
-                //     ]
-                // )
-                // ->send();
-            });
-        return $this->api_responser
-            ->success()
-            ->message('Pickup request initialized successfully')
-            ->payload([
-                'pickup_request' => $result,
-            ])
-            ->send();
+            return $this->api_responser
+                ->success()
+                ->message('Pickup request initialized successfully')
+                ->payload([
+                    'pickup_request' => $result,
+                ])
+                ->send();
         } catch (\Exception $ex) {
             return $this->api_responser
                 ->failed()
@@ -170,48 +170,110 @@ class PickupRequestController extends Controller
      */
     public function confirm(ConfirmPickupRequest $request, $s_id)
     {
-        try{
-        $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
-        if (!firstOf($pickup_request)) {
-            return  $this->api_responser
-                ->failed()
-                ->code(404)
-                ->message('No Pickup request exists with the given s_id')
-                ->send();
-        }
-        $pickup_request = $this->pickup_request_contract->confirm(
-            $s_id,
-            Date::createFromTimeString($request->date_confirmed)
-        );
-        $driver = json_decode($pickup_request->drivers, true)[0];
+        try {
+            $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
+            if (!firstOf($pickup_request)) {
+                return  $this->api_responser
+                    ->failed()
+                    ->code(404)
+                    ->message('No Pickup request exists with the given s_id')
+                    ->send();
+            }
+            $pickup_request = $this->pickup_request_contract->confirm(
+                $s_id,
+                Date::createFromTimeString($request->date_confirmed)
+            );
+            $driver = json_decode($pickup_request->drivers, true)[0];
 
-        event(new StartPickupRequestCalling($pickup_request, $driver));
-        return $this->api_responser
-            ->success()
-            ->payload([
-                'pickup_request' =>
-                [
-                    's_id' => $pickup_request->s_id,
-                    'location' => $pickup_request->location,
-                    'destination' => $pickup_request->destination,
-                    'estimated_price' => $pickup_request->estimated_price,
-                    'estimated_duration' => $pickup_request->estimated_duration,
-                    'driver' =>
+            event(new StartPickupRequestCalling($pickup_request, $driver));
+            return $this->api_responser
+                ->success()
+                ->payload([
+                    'pickup_request' =>
                     [
-                        's_id' => $driver['s_id'],
-                        'full_name' =>  $driver['full_name'],
-                        'phone_number' => $driver['phone_number'],
-                        'location' => $driver['location'],
-                        'photo' =>  $driver['photo'],
+                        's_id' => $pickup_request->s_id,
+                        'location' => $pickup_request->location,
+                        'destination' => $pickup_request->destination,
+                        'estimated_price' => $pickup_request->estimated_price,
+                        'estimated_duration' => $pickup_request->estimated_duration,
+                        'driver' =>
+                        [
+                            's_id' => $driver['s_id'],
+                            'full_name' =>  $driver['full_name'],
+                            'phone_number' => $driver['phone_number'],
+                            'location' => $driver['location'],
+                            'photo' =>  $driver['photo'],
+                        ]
                     ]
-                ]
-            ])
-            ->message('Pickup request confirmed successfully')
-            ->send();
+                ])
+                ->message('Pickup request confirmed successfully')
+                ->send();
         } catch (\Exception $ex) {
             return $this->api_responser
                 ->failed()
                 ->message('Error when confirming pickup request ' . $ex->getMessage())
+                ->send();
+        }
+    }
+    /**
+     * @OA\Post(
+     * path="/api/v1/pickup-requests/{s_id}/finish",
+     * operationId="finish_pickup_request",
+     * tags={"pickup_requests"},
+     * summary="finish pickup request ",
+     * @OA\Parameter(  name="s_id", in="path", description="Pickup request secret id ", required=true),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="date_finish",type="date",example="17-09-2023 15:22"),
+     *             )),
+     *    ),
+     *    @OA\Response( response=200, description="Pickup request finished successfully", @OA\JsonContent() ),
+     *    @OA\Response( response=404, description="No pickup request exists with the given id", @OA\JsonContent() ),
+     *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *     )
+     */
+    public function finish(CancelPickupRequest $request, $s_id)
+    {
+        try {
+            $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
+            if (!firstOf($pickup_request)) {
+                return  $this->api_responser
+                    ->failed()
+                    ->code(404)
+                    ->message('No Pickup request exists with the given s_id')
+                    ->send();
+            }
+            if (firstOf($pickup_request)->status == PickupRequestStatus::VALIDATED->value) {
+
+                return $this->api_responser
+                    ->success()
+                    ->message('Pickup request already finished')
+                    ->send();
+            } else {
+                if (firstOf($pickup_request)->status == PickupRequestStatus::APPROVED->value) {
+                    $pickup_request = $this->pickup_request_contract->finish(
+                        $s_id,
+                        Date::createFromTimeString($request->date_finished)
+                    );
+                    return $this->api_responser
+                        ->success()
+                        ->message('Pickup request finished successfully')
+                        ->send();
+                }
+                else{
+                    return $this->api_responser
+                        ->failed()
+                        ->message('Pickup request is not in an approved status ')
+                        ->send();
+                }
+            }
+        } catch (\Exception $ex) {
+            return $this->api_responser
+                ->failed()
+                ->message('Error when finishing pickup request ' . $ex->getMessage())
                 ->send();
         }
     }
@@ -237,25 +299,25 @@ class PickupRequestController extends Controller
      */
     public function cancel(CancelPickupRequest $request, $s_id)
     {
-        try{
-        $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
-        if (!firstOf($pickup_request)) {
-            return  $this->api_responser
-                ->failed()
-                ->code(404)
-                ->message('No Pickup request exists with the given s_id')
+        try {
+            $pickup_request = $this->pickup_request_contract->findBy('s_id', $s_id);
+            if (!firstOf($pickup_request)) {
+                return  $this->api_responser
+                    ->failed()
+                    ->code(404)
+                    ->message('No Pickup request exists with the given s_id')
+                    ->send();
+            }
+            if (firstOf($pickup_request)->status != PickupRequestStatus::CANCELED->value) {
+                $pickup_request = $this->pickup_request_contract->cancel(
+                    $s_id,
+                    Date::createFromTimeString($request->date_cancelled)
+                );
+            }
+            return $this->api_responser
+                ->success()
+                ->message('Pickup request cancelled successfully')
                 ->send();
-        }
-        if (firstOf($pickup_request)->status != PickupRequestStatus::CANCELED->value) {
-            $pickup_request = $this->pickup_request_contract->cancel(
-                $s_id,
-                Date::createFromTimeString($request->date_cancelled)
-            );
-        }
-        return $this->api_responser
-            ->success()
-            ->message('Pickup request cancelled successfully')
-            ->send();
         } catch (\Exception $ex) {
             return $this->api_responser
                 ->failed()
