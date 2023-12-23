@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class StartPickupRequestCalling implements ShouldBroadcast 
+class StartPickupRequestCalling implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -27,7 +27,7 @@ class StartPickupRequestCalling implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-      
+
         return [
             new Channel('pickup_request.'.$this->driver['s_id'])
         ];

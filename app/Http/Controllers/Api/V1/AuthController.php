@@ -55,7 +55,7 @@ class AuthController extends Controller
 
             }
             catch(Exception $ex){
-                
+
                 return $this->api_responser
                     ->failed($ex->getCode())
                     ->message($ex->getMessage())
@@ -97,7 +97,7 @@ class AuthController extends Controller
         ]);
 
         try {
-            $record = DB::table('otp_verifications')        
+            $record = DB::table('otp_verifications')
                         ->where('phone_number',$request['phone_number']);
             $auth = $record->first();
             if(!$auth) throw new ModelNotFoundException();
@@ -129,7 +129,7 @@ class AuthController extends Controller
                     $users = $this->driver_contract->findBy('phone_number',  ltrim($request['phone_number'],'+'));
                 }
             }
-            // else 
+            // else
             // {
             //     if($request['auth_type'] == 'client') {
             //         $user = $this->client_contract->findBy('phone_number', $request['phone_number']);

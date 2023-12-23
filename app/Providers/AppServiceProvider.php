@@ -5,7 +5,7 @@ namespace App\Providers;
 use App\Contracts\ClientContract;
 use App\Contracts\DriverContract;
 use App\Contracts\FeesContract;
-use App\Contracts\PickUpRequestContract;
+use App\Contracts\PickupRequestContract;
 use App\Contracts\ProvinceContract;
 use App\Helpers\ApiResponser;
 use App\Services\SupaBase\Client;
@@ -25,7 +25,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(ProvinceContract::class, Province::class);
         $this->app->bind(ClientContract::class, Client::class);
         $this->app->bind(DriverContract::class, Driver::class);
-        $this->app->bind(PickUpRequestContract::class, PickupRequest::class);
+        $this->app->bind(PickupRequestContract::class, PickupRequest::class);
         $this->app->bind(FeesContract::class, Fees::class);
         // $this->app->singleton(ApiResponser::class, function () {
         //     return new ApiResponser();

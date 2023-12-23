@@ -761,6 +761,50 @@
                 }
             }
         },
+        "/api/v1/drivers/{s_id}/pickups-history": {
+            "get": {
+                "tags": [
+                    "drivers"
+                ],
+                "summary": "get driver  pickups history using secret id",
+                "description": "get driver  pickup history using secret id",
+                "operationId": "get driver pickups history",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "driver secret id ",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "driver  pickups history fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "no driver found",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pickup-requests/initialize": {
             "post": {
                 "tags": [

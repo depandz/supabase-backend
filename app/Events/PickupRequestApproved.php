@@ -10,7 +10,7 @@ use Illuminate\Contracts\Broadcasting\ShouldBroadcast;
 use Illuminate\Foundation\Events\Dispatchable;
 use Illuminate\Queue\SerializesModels;
 
-class PickupRequestApproved implements ShouldBroadcast 
+class PickupRequestApproved implements ShouldBroadcast
 {
     use Dispatchable, InteractsWithSockets, SerializesModels;
 
@@ -28,7 +28,7 @@ class PickupRequestApproved implements ShouldBroadcast
      */
     public function broadcastOn(): array
     {
-      
+
         return [
             new Channel('pickup_request.'.$this->pickup->s_id)
         ];

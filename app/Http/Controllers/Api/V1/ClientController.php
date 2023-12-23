@@ -5,7 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use Exception;
 use Illuminate\Http\Request;
 use App\Contracts\ClientContract;
-use App\Contracts\PickUpRequestContract;
+use App\Contracts\PickupRequestContract;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\ClientRegisterRequest;
 use App\Services\Locale\Client as ClientRepository;
@@ -23,7 +23,7 @@ class ClientController extends Controller
          * @var ClientContract
          * @var ClientRepository
          */
-        public function __construct(ClientContract $client_contract,ClientRepository $repository,PickUpRequestContract $pickup)
+        public function __construct(ClientContract $client_contract,ClientRepository $repository,PickupRequestContract $pickup)
         {
             parent::__construct();
             $this->client_contract = $client_contract;

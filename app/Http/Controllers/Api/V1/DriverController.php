@@ -6,11 +6,11 @@ use Exception;
 use Illuminate\Support\Arr;
 use Illuminate\Http\Request;
 use App\Contracts\DriverContract;
+use App\Events\NoDriverAvailable;
 use App\Enums\PickupRequestStatus;
 use App\Http\Controllers\Controller;
-use App\Contracts\PickUpRequestContract;
-use App\Events\NoDriverAvailable;
 use App\Events\PickupRequestApproved;
+use App\Contracts\PickupRequestContract;
 use App\Events\StartPickupRequestCalling;
 use App\Http\Requests\DriverUpdateRequest;
 
@@ -21,7 +21,7 @@ class DriverController extends Controller
     /**
      * @var DriverContract
      */
-    public function __construct(DriverContract $driver_contract, PickUpRequestContract $pickup_request_contract)
+    public function __construct(DriverContract $driver_contract, PickupRequestContract $pickup_request_contract)
     {
         parent::__construct();
         $this->driver_contract = $driver_contract;
@@ -288,7 +288,7 @@ class DriverController extends Controller
                 return  $this->api_responser
                     ->failed()
                     ->code(200)
-                    ->message('Pickup request declined successfully')
+                    ->message('No driver still available')
                     ->send();
             }
             event(new StartPickupRequestCalling($pickup_request, $drivers[0]));
@@ -378,6 +378,46 @@ class DriverController extends Controller
                     ->success()
                     ->message('online status switched successfully')
                     ->payload($driver)
+                    ->send();
+            }
+            catch(Exception $ex){
+
+                return $this->api_responser
+                    ->failed($ex->getCode())
+                    ->message($ex->getMessage())
+                    ->send();
+            }
+        }
+                  /**
+        * @OA\Get(
+        * path="/api/v1/drivers/{s_id}/pickups-history",
+        * operationId="get driver pickups history",
+        * tags={"drivers"},
+        * summary="get driver  pickups history using secret id",
+        * description="get driver  pickup history using secret id",
+        * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+        * @OA\Response( response=200, description="driver  pickups history fetched successfully", @OA\JsonContent() ),
+        * @OA\Response( response=404,description="no driver found", @OA\JsonContent()),
+        * @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+        *     )
+        */
+        public function pickupsHistory($s_id)
+        {
+            try {
+                $driver = firstOf($this->driver_contract->findBy('s_id', $s_id));
+                if($driver){
+                    $pickups = $this->pickup_request_contract->history(id:$driver->id,type:"driver");
+
+                    return $this->api_responser
+                    ->success()
+                    ->message('Driver  pickups history fetched successfully')
+                    ->payload($pickups)
+                    ->send();
+                }
+                return $this->api_responser
+                    ->failed()
+                    ->code(404)
+                    ->message('no driver found')
                     ->send();
             }
             catch(Exception $ex){

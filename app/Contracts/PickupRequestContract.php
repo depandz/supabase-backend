@@ -6,7 +6,7 @@ use Illuminate\Http\File;
 use Illuminate\Support\Collection;
 use App\DataTransferObjects\PickupRequestDTO as PickupRequest;
 
-interface PickUpRequestContract extends SupaBaseContract
+interface PickupRequestContract extends SupaBaseContract
 {
     public function insert(array $data): PickupRequest;
 
@@ -15,7 +15,7 @@ interface PickUpRequestContract extends SupaBaseContract
     public function checkExist(int $client_id, int $distance): PickupRequest|null;
 
     public function confirm(string $s_id, $date_confirmed): PickupRequest|null;
-    
+
     public function approve(string $s_id, int $driver): PickupRequest|null;
 
     public function cancel(string $s_id, $date_cancelled): bool |null;
