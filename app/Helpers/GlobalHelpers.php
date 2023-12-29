@@ -20,7 +20,7 @@ if(!function_exists('generate_sid')){
             default:
                 $prefix =  GlobalVars::$PICKUP_SID_IDENTIFICATION;
                 break;
-            
+
         }
         return $prefix.'_'.explode('-',Str::uuid())[0];
 
@@ -36,7 +36,7 @@ if(!function_exists('firstOf')){
 if(!function_exists('isEightPM')){
     function isEightPM(string $date){
         $date_requested = strtotime($date);
-    
+
         // Define the desired time (8:00 PM) as a timestamp
         $desiredTime = strtotime('20:00:00', $date_requested);
 
@@ -45,7 +45,7 @@ if(!function_exists('isEightPM')){
     }
 }
 /**
- * check if a client exists by id 
+ * check if a client exists by id
  */
 if(!function_exists('checkClientExists')) {
     function checkClientExists($client_id)
@@ -58,5 +58,18 @@ if(!function_exists('checkClientExists')) {
                       ->send();
         }
         return true;
+    }
+}
+if(!function_exists('getPickupClientData')) {
+    function getPickupClientData($client_id)
+    {
+        $client = (new Client())->findBy('id', $client_id);
+        if(!firstOf($client)) {
+            return  (new ApiResponser())
+                      ->failed()
+                      ->message('No Client exists with the given id')
+                      ->send();
+        }
+        return firstOf($client);
     }
 }

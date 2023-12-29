@@ -68,7 +68,7 @@ class PickupRequestController extends Controller
         try {
             $data = $request->all();
             //check client exists
-            $client = checkClientExists($request->client_id);
+            // $client = checkClientExists($request->client_id);
             $result = $this->pipeline
                 ->send((array)$data)
                 ->through([
@@ -184,6 +184,8 @@ class PickupRequestController extends Controller
                 Date::createFromTimeString($request->date_confirmed)
             );
             $driver = json_decode($pickup_request->drivers, true)[0];
+
+
 
             event(new StartPickupRequestCalling($pickup_request, $driver));
             return $this->api_responser

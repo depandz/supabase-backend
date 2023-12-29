@@ -39,6 +39,9 @@ class StartPickupRequestCalling implements ShouldBroadcast
      */
     public function broadcastWith(): array
     {
+        //get the client data
+        $client =getPickupClientData($this->pickup->client_id);
+
         return [
             'pickup_request'=>
             [
@@ -47,6 +50,13 @@ class StartPickupRequestCalling implements ShouldBroadcast
                     'destination'=>$this->pickup->destination,
                     'estimated_price'=>$this->pickup->estimated_price,
                     'estimated_duration'=>$this->pickup->estimated_duration,
+            ],
+            'client'=>
+            [
+                'first_name'=>$client->first_name,
+                'last_name'=>$client->last_name,
+                'photo'=>$client->photo,
+                'phone_number'=>$client->phone_number
             ]
             ];
     }
