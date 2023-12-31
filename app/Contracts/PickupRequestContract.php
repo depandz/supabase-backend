@@ -25,4 +25,8 @@ interface PickupRequestContract extends SupaBaseContract
     public function history(int $id,string $type): Collection |null;
 
     public function rate(string $s_id,int $rating,?string $rating_comment): bool |null;
+
+    public function confirmReachedToClient(string $s_id, $date_confirmed): bool|null;
+
+    public function findByWithSecrets(string $column, string $value): PickupRequest|null;
 }

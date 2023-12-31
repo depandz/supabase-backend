@@ -45,7 +45,9 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::get('{s_id}','show');
         Route::put('{s_id}/update','update');
         Route::post('{s_id}/update-photo','updatePhoto');
-        Route::post('{s_id}/pickup-requests/{pickup_sid}/{action}','AcceptDeclinePickupRequest');
+        Route::post('{s_id}/pickup-requests/{pickup_sid}/accept','AcceptDeclinePickupRequest');
+        Route::post('{s_id}/pickup-requests/{pickup_sid}/decline','AcceptDeclinePickupRequest');
+        Route::post('{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-client','confirmReachedToClient');
         Route::put('{s_id}/switch-online-status','switchOnlineStatus');
         Route::get('{s_id}/pickups-history','pickupsHistory');
 
@@ -53,7 +55,7 @@ Route::group(['as' => 'api_v1.'], function () {
     Route::controller(PickupRequestController::class)->prefix('pickup-requests')->group(function(){
         Route::post('/initialize','initialize');
         Route::post('/{s_id}/confirm','confirm'); //client
-        Route::post('/{s_id}/finish','finish'); //client
+        Route::post('/{s_id}/finish','finish'); //driver
         Route::post('/{s_id}/cancel','cancel');
         Route::post('/{s_id}/rate','rateDriver');
     });

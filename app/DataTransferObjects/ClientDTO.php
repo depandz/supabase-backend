@@ -6,8 +6,8 @@ use DateTime;
 
 class ClientDTO
 {
-    
-   
+
+
 
     public function __construct(
         public ?string $id=null,
@@ -24,7 +24,7 @@ class ClientDTO
         public ?string $account_status=null,
         public ?string $registered_at=null,
     ){
-        $this->registered_at = (new DateTime($this->registered_at))->format('d-m-Y H:i');
+        $this->registered_at = (new DateTime($this->registered_at))->format('Y-m-d');
         $this->phone_number = '+'.$this->phone_number;
     }
 

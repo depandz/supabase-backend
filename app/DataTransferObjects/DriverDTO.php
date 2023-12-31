@@ -31,7 +31,7 @@ class DriverDTO
         public  ?float $rating=0,
 
     ) {
-        $this->registered_at = (new DateTime($this->registered_at))->format('d-m-Y H:i');
+        $this->registered_at = (new DateTime($this->registered_at))->format('Y-m-d');
         $this->phone_number = '+'.$this->phone_number;
     }
 

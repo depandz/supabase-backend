@@ -121,6 +121,43 @@ class PickupRequest implements PickupRequestContract
             throw $ex;
         }
     }
+    public function findByWithSecrets($column, $value): PickpRequestObject|null
+    {
+
+        try {
+            $pickup_requests = Collection::make(
+                $this->db_instance
+                    ->findBy($column, $value)
+                    ->getResult()
+            )
+                ->map(function ($item) {
+                    $item = (array) $item;
+
+                    return new PickpRequestObject(
+                        $item['s_id'],
+                        $item['client_id'],
+                        $item['driver_id'],
+                        new PositionDTO(lat: $item['location']->lat, lng: $item['location']->lng),
+                        new PositionDTO(lat: $item['destination']->lat, lng: $item['destination']->lng),
+                        $item['estimated_distance'],
+                        $item['estimated_price'],
+                        $item['estimated_duration'],
+                        $item['vehicle_type'],
+                        $item['is_vehicle_empty'],
+                        $item['vehicle_licence_plate'],
+                        $item['date_requested'],
+                        $item['status'],
+                        $item['drivers'],
+                        client_location_qr_code_secret:$item['client_location_qr_code_secret'],
+                        client_arrival_qr_code_secret:$item['client_location_qr_code_secret'],
+                    );
+                });
+
+            return firstOf($pickup_requests);
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
 
     public function insert($data): PickpRequestObject
     {
@@ -162,7 +199,7 @@ class PickupRequest implements PickupRequestContract
             // if(array_key_exists('location',$data)){
             //     $data['location'] = json_encode($data['location']);
             // }
-            $pickup_request = $data = supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
+            $pickup_request = supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
             $pickup_request =  (array)$pickup_request[0];
 
             return new PickpRequestObject(
@@ -180,6 +217,8 @@ class PickupRequest implements PickupRequestContract
                 $pickup_request['date_requested'],
                 $pickup_request['status'],
                 $pickup_request['drivers'],
+                client_location_qr_code_secret:$pickup_request['client_location_qr_code_secret'],
+                client_arrival_qr_code_secret:$pickup_request['client_location_qr_code_secret'],
             );
         } catch (Exception $ex) {
             throw $ex;
@@ -240,9 +279,12 @@ class PickupRequest implements PickupRequestContract
     public function confirm(string $s_id, $date_confirmed): PickpRequestObject | null
     {
         try {
+            //generate a secret key of 30 length
             $data = [
                 'updated_at' => Date::createFromTimeString($date_confirmed),
-                'status' => PickupRequestStatus::PENDING->value
+                'status' => PickupRequestStatus::PENDING->value,
+                'client_location_qr_code_secret'=>bin2hex(random_bytes(15)),
+                'client_arrival_qr_code_secret'=>bin2hex(random_bytes(15)),
             ];
             return $this->update($s_id, $data);
         } catch (Exception $ex) {
@@ -264,11 +306,14 @@ class PickupRequest implements PickupRequestContract
     public function finish(string $s_id,$date_finished): bool | null
     {
         try {
+            // 'client_location_qr_code_secret'=>null,
+            // 'client_reached_at'=>Date::createFromTimeString($date_confirmed),
             $data = [
                 'updated_at' => Date::createFromTimeString($date_finished),
                 'status' => PickupRequestStatus::VALIDATED->value,
             ];
-            return $this->update($s_id, $data) ? true : false;
+            $pickup_request =  supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
+            return $pickup_request[0] ? true :false;
         } catch (Exception $ex) {
             throw $ex;
         }
@@ -280,7 +325,8 @@ class PickupRequest implements PickupRequestContract
                 'updated_at' => Date::createFromTimeString($date_cancelled),
                 'status' => PickupRequestStatus::CANCELED->value
             ];
-            return $this->update($s_id, $data) ? true : false;
+            $pickup_request =  supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
+            return $pickup_request[0] ? true :false;
         } catch (Exception $ex) {
             throw $ex;
         }
@@ -320,6 +366,20 @@ class PickupRequest implements PickupRequestContract
                 'rating_comment' => $rating_comment,
             ];
             return $this->update($s_id, $data) ? true : false;
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
+    public function confirmReachedToClient(string $s_id, $date_confirmed): bool | null
+    {
+        try {
+
+            $data = [
+                'client_location_qr_code_secret'=>null,
+                // 'client_reached_at'=>Date::createFromTimeString($date_confirmed),
+            ];
+            $pickup_request =  supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
+            return $pickup_request[0] ? true :false;
         } catch (Exception $ex) {
             throw $ex;
         }

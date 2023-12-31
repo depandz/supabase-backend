@@ -198,6 +198,8 @@ class PickupRequestController extends Controller
                         'destination' => $pickup_request->destination,
                         'estimated_price' => $pickup_request->estimated_price,
                         'estimated_duration' => $pickup_request->estimated_duration,
+                        'client_location_qr_code_secret' => $pickup_request->client_location_qr_code_secret,
+                        'client_arrival_qr_code_secret' => $pickup_request->client_arrival_qr_code_secret,
                         'driver' =>
                         [
                             's_id' => $driver['s_id'],

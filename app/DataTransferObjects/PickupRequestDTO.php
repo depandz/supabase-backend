@@ -11,7 +11,7 @@ use Illuminate\Support\Facades\Date;
 
 class PickupRequestDTO
 {
-    
+
     public function __construct(
         public ?string $s_id=null,
         public ?int $client_id,
@@ -27,6 +27,8 @@ class PickupRequestDTO
         public $date_requested=null,
         public ?string $status=null,
         public $drivers=null,
+        public ?string $client_location_qr_code_secret=null,
+        public ?string $client_arrival_qr_code_secret=null,
     ){}
     public function asArray(){
         return  (array) $this;
