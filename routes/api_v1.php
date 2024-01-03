@@ -48,6 +48,7 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::post('{s_id}/pickup-requests/{pickup_sid}/accept','AcceptDeclinePickupRequest');
         Route::post('{s_id}/pickup-requests/{pickup_sid}/decline','AcceptDeclinePickupRequest');
         Route::post('{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-client','confirmReachedToClient');
+        Route::post('{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-destination','confirmReachedToDestination');
         Route::put('{s_id}/switch-online-status','switchOnlineStatus');
         Route::get('{s_id}/pickups-history','pickupsHistory');
 

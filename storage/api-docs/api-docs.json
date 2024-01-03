@@ -850,7 +850,94 @@
                 },
                 "responses": {
                     "200": {
-                        "description": "Client Reached successfully",
+                        "description": "Client location Reached successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No pickup request exists with the given s_id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "You are not authorized to do deal with this pickup request",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Pickup request has been canceled by client",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-destination": {
+            "post": {
+                "tags": [
+                    "drivers"
+                ],
+                "summary": "confirm that driver reached client destinatino",
+                "operationId": "confirm reached to client destinatino",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "driver secret id ",
+                        "required": true
+                    },
+                    {
+                        "name": "pickup_sid",
+                        "in": "path",
+                        "description": "pickup secret id ",
+                        "required": true
+                    }
+                ],
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "secret_code": {
+                                        "type": "string"
+                                    },
+                                    "date_confirmed": {
+                                        "type": "string",
+                                        "format": "date",
+                                        "example": "21-12-2023 15:22"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
+                "responses": {
+                    "200": {
+                        "description": "Client destinatino Reached successfully",
                         "content": {
                             "application/json": {
                                 "schema": {}

@@ -28,5 +28,7 @@ interface PickupRequestContract extends SupaBaseContract
 
     public function confirmReachedToClient(string $s_id, $date_confirmed): bool|null;
 
+    public function confirmReachedToDestination(string $s_id, $date_confirmed): bool|null;
+
     public function findByWithSecrets(string $column, string $value): PickupRequest|null;
 }

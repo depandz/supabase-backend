@@ -499,13 +499,94 @@ class DriverController extends Controller
             ->message('wrong secret_code provided')
             ->send();
         }
-        //TODO:check if client_reached_at later
+        //TODO:add if client_reached_at later
         $pickup_request = $this->pickup_request_contract->confirmReachedToClient($pickup_sid,$request->date_confirmed);
 
             return  $this->api_responser
                 ->success()
                 ->code(200)
                 ->message('Client location Reached successfully')
+                ->send();
+
+    }
+            /**
+     * @OA\Post(
+     * path="/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-destination",
+     * operationId="confirm reached to client destinatino",
+     * tags={"drivers"},
+     * summary="confirm that driver reached client destinatino",
+     * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+     * @OA\Parameter(  name="pickup_sid", in="path", description="pickup secret id ", required=true),
+     *     @OA\RequestBody(
+        *         @OA\JsonContent(),
+        *         @OA\MediaType(
+        *            mediaType="application/x-www-form-urlencoded",
+        *             @OA\Schema(
+        *                 @OA\Property(property="secret_code",type="string"),
+        *                 @OA\Property(property="date_confirmed",type="date",example="21-12-2023 15:22"),
+        *             )),
+        *    ),
+     *    @OA\Response( response=200, description="Client destinatino Reached successfully", @OA\JsonContent() ),
+     *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *    @OA\Response( response=404, description="No pickup request exists with the given s_id", @OA\JsonContent() ),
+     *    @OA\Response( response=403, description="You are not authorized to do deal with this pickup request", @OA\JsonContent() ),
+     *    @OA\Response( response=204, description="Pickup request has been canceled by client", @OA\JsonContent() ),
+     *     )
+     */
+    public function confirmReachedToDestination($s_id, $pickup_sid,Request $request)
+    {
+        $pickup_request = $this->pickup_request_contract->findByWithSecrets('s_id', $pickup_sid);
+        if (!$pickup_request) {
+            return  $this->api_responser
+                ->failed()
+                ->code(404)
+                ->message('No Pickup request exists with the given s_id')
+                ->send();
+        }
+        //if is canceled by client
+        if ($pickup_request->status == PickupRequestStatus::CANCELED->value) {
+            return  $this->api_responser
+                ->failed()
+                ->code(204)
+                ->message('Pickup request has been canceled by client')
+                ->send();
+        }
+
+         $driver= firstOf($this->driver_contract->findBy('s_id',$s_id));
+         //if no driver
+         if(!$driver) {
+            return  $this->api_responser
+            ->failed()
+            ->code(403)
+            ->message('No driver found with this s_id')
+            ->send();
+        }
+         //if a wrong driver sid
+         if($driver && $driver->s_id !== $s_id) {
+
+            return  $this->api_responser
+            ->failed()
+            ->code(403)
+            ->message('You are not authorized to do deal with this pickup request')
+            ->send();
+        }
+         //if a wrong qr_code_secret
+
+         if($pickup_request && $pickup_request->client_arrival_qr_code_secret !== $request->secret_code) {
+
+            return  $this->api_responser
+            ->failed()
+            ->code(403)
+            ->message('wrong secret_code provided')
+            ->send();
+        }
+        //TODO:add if client_reached_at later
+        $pickup_request = $this->pickup_request_contract->confirmReachedToDestination($pickup_sid,$request->date_confirmed);
+
+            return  $this->api_responser
+                ->success()
+                ->code(200)
+                ->message('Client destination Reached successfully')
                 ->send();
 
     }

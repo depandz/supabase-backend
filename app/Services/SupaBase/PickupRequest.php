@@ -149,7 +149,7 @@ class PickupRequest implements PickupRequestContract
                         $item['status'],
                         $item['drivers'],
                         client_location_qr_code_secret:$item['client_location_qr_code_secret'],
-                        client_arrival_qr_code_secret:$item['client_location_qr_code_secret'],
+                        client_arrival_qr_code_secret:$item['client_arrival_qr_code_secret'],
                     );
                 });
 
@@ -376,7 +376,23 @@ class PickupRequest implements PickupRequestContract
 
             $data = [
                 'client_location_qr_code_secret'=>null,
-                // 'client_reached_at'=>Date::createFromTimeString($date_confirmed),
+                'client_reached_at'=>Date::createFromTimeString($date_confirmed),
+            ];
+            $pickup_request =  supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
+            return $pickup_request[0] ? true :false;
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
+    public function confirmReachedToDestination(string $s_id, $date_confirmed): bool | null
+    {
+        try {
+
+            $data = [
+                'client_arrival_qr_code_secret'=>null,
+                'updated_at' => Date::createFromTimeString($date_confirmed),
+                'status' => PickupRequestStatus::VALIDATED->value,
+                'destination_reached_at'=>Date::createFromTimeString($date_confirmed),
             ];
             $pickup_request =  supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
             return $pickup_request[0] ? true :false;
