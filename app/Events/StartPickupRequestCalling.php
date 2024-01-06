@@ -50,13 +50,13 @@ class StartPickupRequestCalling implements ShouldBroadcast
                     'destination'=>$this->pickup->destination,
                     'estimated_price'=>$this->pickup->estimated_price,
                     'estimated_duration'=>$this->pickup->estimated_duration,
-            ],
-            'client'=>
-            [
-                'first_name'=>$client->first_name,
-                'last_name'=>$client->last_name,
-                'photo'=>$client->photo,
-                'phone_number'=>$client->phone_number
+                    'client'=>
+                    [
+                        'first_name'=>$client->first_name,
+                        'last_name'=>$client->last_name,
+                        'photo'=>$client->photo,
+                        'phone_number'=>$client->phone_number
+                    ]
             ]
             ];
     }
