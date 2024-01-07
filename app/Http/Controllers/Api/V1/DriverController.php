@@ -12,6 +12,7 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Date;
 use App\Events\PickupRequestApproved;
 use App\Contracts\PickupRequestContract;
+use App\Events\PickupRequestCancelled;
 use App\Events\StartPickupRequestCalling;
 use App\Http\Requests\DriverUpdateRequest;
 
@@ -221,7 +222,7 @@ class DriverController extends Controller
      *    @OA\Response( response=204, description="Pickup request has been canceled by client", @OA\JsonContent() ),
      *     )
      */
-    public function AcceptDeclinePickupRequest($s_id, $pickup_sid, $action)
+    public function AcceptDeclinePickupRequest($s_id, $pickup_sid)
     {
         $pickup_request = firstOf($this->pickup_request_contract->findBy('s_id', $pickup_sid));
         if (!$pickup_request) {
@@ -257,7 +258,8 @@ class DriverController extends Controller
                 ->message('You are not authorized to do deal with this pickup request')
                 ->send();
         }
-        if ($action == "decline") {
+
+        if (request()->segment(7) == "decline") {
             $exists = false;
             foreach ($drivers as $key => $driver) {
 
@@ -266,15 +268,14 @@ class DriverController extends Controller
                     unset($drivers[$key]);
                     break;
                 }
-
             }
-            if(!$exists) {
+            if (!$exists) {
 
                 return  $this->api_responser
-                ->failed()
-                ->code(403)
-                ->message('You are not authorized to do deal with this pickup request')
-                ->send();
+                    ->failed()
+                    ->code(403)
+                    ->message('You are not authorized to do deal with this pickup request')
+                    ->send();
             }
 
             $drivers = array_values($drivers);
@@ -283,6 +284,7 @@ class DriverController extends Controller
                 $pickup_sid,
                 ['drivers' => json_encode($drivers)]
             );
+
             //if no driver still available
             if (!count($drivers)) {
                 event(new NoDriverAvailable($pickup_request));
@@ -307,7 +309,7 @@ class DriverController extends Controller
                         'driver' =>
                         [
                             's_id' => $drivers[0]['s_id'],
-                            'full_name' => $drivers[0]['first_name'].' '.$drivers[0]['last_name'],
+                            'full_name' => array_key_exists('full_name',$drivers[0]) ? $drivers[0]['full_name'] :  $drivers[0]['first_name'] . ' ' . $drivers[0]['last_name'],
                             'phone_number' => $drivers[0]['phone_number'],
                             'location' => $drivers[0]['location'],
                             'photo' => url('storage/drivers/photos/' . $drivers[0]['photo']),
@@ -316,8 +318,8 @@ class DriverController extends Controller
                 ])
                 ->message('Pickup request declined successfully')
                 ->send();
-        }
-        else {
+        } else {
+
             $exists = null;
             foreach ($drivers as $key => $driver) {
 
@@ -325,21 +327,20 @@ class DriverController extends Controller
                     $exists = $driver;
                     break;
                 }
-
             }
 
-            if(!$exists) $driver= firstOf($this->driver_contract->findBy('s_id',$s_id));
-            if(!$driver){
+            if (!$exists) $driver = firstOf($this->driver_contract->findBy('s_id', $s_id));
+            if (!$driver) {
                 return  $this->api_responser
-                ->failed()
-                ->code(403)
-                ->message('You are not authorized to do deal with this pickup request')
-                ->send();
+                    ->failed()
+                    ->code(403)
+                    ->message('You are not authorized to do deal with this pickup request')
+                    ->send();
             }
 
-            $pickup_request = $this->pickup_request_contract->approve($pickup_sid,$driver['id']);
+            $pickup_request = $this->pickup_request_contract->approve($pickup_sid, $driver['id']);
 
-            event(new PickupRequestApproved($pickup_request,$driver));
+            event(new PickupRequestApproved($pickup_request, $driver));
 
             return  $this->api_responser
                 ->success()
@@ -348,88 +349,86 @@ class DriverController extends Controller
                 ->send();
         }
     }
-     /**
-        * @OA\Put(
-        * path="/api/v1/drivers/{s_id}/switch-online-status",
-        * operationId="switch-online-status for a driver",
-        * tags={"drivers"},
-        * summary="switch-online-status for a driver",
-        * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
-        *     @OA\RequestBody(
-        *         @OA\JsonContent(),
-        *         @OA\MediaType(
-        *            mediaType="application/x-www-form-urlencoded",
-        *             @OA\Schema(
-        *                 @OA\Property(property="status",type="boolean",enum={0,1}),
-        *             )),
-        *    ),
-        *    @OA\Response( response=200, description="online status switched successfully", @OA\JsonContent() ),
-        *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
-        *     )
-        */
-        public function switchOnlineStatus(Request $request, $s_id)
-        {
-            try{
-                $this->validate($request,[
-                    'status'=>'required|boolean|in:0,1'
-                ]);
-                $driver = $this->driver_contract->switchOnlineStatus($s_id,$request->status);
+    /**
+     * @OA\Put(
+     * path="/api/v1/drivers/{s_id}/switch-online-status",
+     * operationId="switch-online-status for a driver",
+     * tags={"drivers"},
+     * summary="switch-online-status for a driver",
+     * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+     *     @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="status",type="boolean",enum={0,1}),
+     *             )),
+     *    ),
+     *    @OA\Response( response=200, description="online status switched successfully", @OA\JsonContent() ),
+     *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *     )
+     */
+    public function switchOnlineStatus(Request $request, $s_id)
+    {
+        try {
+            $this->validate($request, [
+                'status' => 'required|boolean|in:0,1'
+            ]);
+            $driver = $this->driver_contract->switchOnlineStatus($s_id, $request->status);
 
-                return $this->api_responser
-                    ->success()
-                    ->message('online status switched successfully')
-                    ->payload($driver)
-                    ->send();
-            }
-            catch(Exception $ex){
+            return $this->api_responser
+                ->success()
+                ->message('online status switched successfully')
+                ->payload($driver)
+                ->send();
+        } catch (Exception $ex) {
 
-                return $this->api_responser
-                    ->failed($ex->getCode())
-                    ->message($ex->getMessage())
-                    ->send();
-            }
+            return $this->api_responser
+                ->failed($ex->getCode())
+                ->message($ex->getMessage())
+                ->send();
         }
-                  /**
-        * @OA\Get(
-        * path="/api/v1/drivers/{s_id}/pickups-history",
-        * operationId="get driver pickups history",
-        * tags={"drivers"},
-        * summary="get driver  pickups history using secret id",
-        * description="get driver  pickup history using secret id",
-        * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
-        * @OA\Response( response=200, description="driver  pickups history fetched successfully", @OA\JsonContent() ),
-        * @OA\Response( response=404,description="no driver found", @OA\JsonContent()),
-        * @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
-        *     )
-        */
-        public function pickupsHistory($s_id)
-        {
-            try {
-                $driver = firstOf($this->driver_contract->findBy('s_id', $s_id));
-                if($driver){
-                    $pickups = $this->pickup_request_contract->history(id:$driver->id,type:"driver");
+    }
+    /**
+     * @OA\Get(
+     * path="/api/v1/drivers/{s_id}/pickups-history",
+     * operationId="get driver pickups history",
+     * tags={"drivers"},
+     * summary="get driver  pickups history using secret id",
+     * description="get driver  pickup history using secret id",
+     * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+     * @OA\Response( response=200, description="driver  pickups history fetched successfully", @OA\JsonContent() ),
+     * @OA\Response( response=404,description="no driver found", @OA\JsonContent()),
+     * @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *     )
+     */
+    public function pickupsHistory($s_id)
+    {
+        try {
+            $driver = firstOf($this->driver_contract->findBy('s_id', $s_id));
+            if ($driver) {
+                $pickups = $this->pickup_request_contract->history(id: $driver->id, type: "driver");
 
-                    return $this->api_responser
+                return $this->api_responser
                     ->success()
                     ->message('Driver  pickups history fetched successfully')
                     ->payload($pickups)
                     ->send();
-                }
-                return $this->api_responser
-                    ->failed()
-                    ->code(404)
-                    ->message('no driver found')
-                    ->send();
             }
-            catch(Exception $ex){
+            return $this->api_responser
+                ->failed()
+                ->code(404)
+                ->message('no driver found')
+                ->send();
+        } catch (Exception $ex) {
 
-                return $this->api_responser
-                    ->failed($ex->getCode())
-                    ->message($ex->getMessage())
-                    ->send();
-            }
+            return $this->api_responser
+                ->failed($ex->getCode())
+                ->message($ex->getMessage())
+                ->send();
         }
-            /**
+    }
+    /**
      * @OA\Post(
      * path="/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-client",
      * operationId="confirm reached to client location",
@@ -438,14 +437,14 @@ class DriverController extends Controller
      * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
      * @OA\Parameter(  name="pickup_sid", in="path", description="pickup secret id ", required=true),
      *     @OA\RequestBody(
-        *         @OA\JsonContent(),
-        *         @OA\MediaType(
-        *            mediaType="application/x-www-form-urlencoded",
-        *             @OA\Schema(
-        *                 @OA\Property(property="secret_code",type="string"),
-        *                 @OA\Property(property="date_confirmed",type="date",example="21-12-2023 15:22"),
-        *             )),
-        *    ),
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="secret_code",type="string"),
+     *                 @OA\Property(property="date_confirmed",type="date",example="21-12-2023 15:22"),
+     *             )),
+     *    ),
      *    @OA\Response( response=200, description="Client location Reached successfully", @OA\JsonContent() ),
      *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
      *    @OA\Response( response=404, description="No pickup request exists with the given s_id", @OA\JsonContent() ),
@@ -453,7 +452,7 @@ class DriverController extends Controller
      *    @OA\Response( response=204, description="Pickup request has been canceled by client", @OA\JsonContent() ),
      *     )
      */
-    public function confirmReachedToClient($s_id, $pickup_sid,Request $request)
+    public function confirmReachedToClient($s_id, $pickup_sid, Request $request)
     {
         $pickup_request = $this->pickup_request_contract->findByWithSecrets('s_id', $pickup_sid);
         if (!$pickup_request) {
@@ -472,44 +471,43 @@ class DriverController extends Controller
                 ->send();
         }
 
-         $driver= firstOf($this->driver_contract->findBy('s_id',$s_id));
-         //if no driver
-         if(!$driver) {
+        $driver = firstOf($this->driver_contract->findBy('s_id', $s_id));
+        //if no driver
+        if (!$driver) {
             return  $this->api_responser
-            ->failed()
-            ->code(403)
-            ->message('No driver found with this s_id')
-            ->send();
+                ->failed()
+                ->code(403)
+                ->message('No driver found with this s_id')
+                ->send();
         }
-         //if a wrong driver sid
-         if($driver && $driver->s_id !== $s_id) {
+        //if a wrong driver sid
+        if ($driver && $driver->s_id !== $s_id) {
 
             return  $this->api_responser
-            ->failed()
-            ->code(403)
-            ->message('You are not authorized to do deal with this pickup request')
-            ->send();
+                ->failed()
+                ->code(403)
+                ->message('You are not authorized to do deal with this pickup request')
+                ->send();
         }
-         //if a wrong qr_code_secret
-         if($pickup_request && $pickup_request->client_location_qr_code_secret !== $request->secret_code) {
+        //if a wrong qr_code_secret
+        if ($pickup_request && $pickup_request->client_location_qr_code_secret !== $request->secret_code) {
 
             return  $this->api_responser
-            ->failed()
-            ->code(403)
-            ->message('wrong secret_code provided')
-            ->send();
+                ->failed()
+                ->code(403)
+                ->message('wrong secret_code provided')
+                ->send();
         }
         //TODO:add if client_reached_at later
-        $pickup_request = $this->pickup_request_contract->confirmReachedToClient($pickup_sid,$request->date_confirmed);
+        $pickup_request = $this->pickup_request_contract->confirmReachedToClient($pickup_sid, $request->date_confirmed);
 
-            return  $this->api_responser
-                ->success()
-                ->code(200)
-                ->message('Client location Reached successfully')
-                ->send();
-
+        return  $this->api_responser
+            ->success()
+            ->code(200)
+            ->message('Client location Reached successfully')
+            ->send();
     }
-            /**
+    /**
      * @OA\Post(
      * path="/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-destination",
      * operationId="confirm reached to client destinatino",
@@ -518,14 +516,14 @@ class DriverController extends Controller
      * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
      * @OA\Parameter(  name="pickup_sid", in="path", description="pickup secret id ", required=true),
      *     @OA\RequestBody(
-        *         @OA\JsonContent(),
-        *         @OA\MediaType(
-        *            mediaType="application/x-www-form-urlencoded",
-        *             @OA\Schema(
-        *                 @OA\Property(property="secret_code",type="string"),
-        *                 @OA\Property(property="date_confirmed",type="date",example="21-12-2023 15:22"),
-        *             )),
-        *    ),
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="secret_code",type="string"),
+     *                 @OA\Property(property="date_confirmed",type="date",example="21-12-2023 15:22"),
+     *             )),
+     *    ),
      *    @OA\Response( response=200, description="Client destinatino Reached successfully", @OA\JsonContent() ),
      *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
      *    @OA\Response( response=404, description="No pickup request exists with the given s_id", @OA\JsonContent() ),
@@ -533,7 +531,7 @@ class DriverController extends Controller
      *    @OA\Response( response=204, description="Pickup request has been canceled by client", @OA\JsonContent() ),
      *     )
      */
-    public function confirmReachedToDestination($s_id, $pickup_sid,Request $request)
+    public function confirmReachedToDestination($s_id, $pickup_sid, Request $request)
     {
         $pickup_request = $this->pickup_request_contract->findByWithSecrets('s_id', $pickup_sid);
         if (!$pickup_request) {
@@ -552,42 +550,146 @@ class DriverController extends Controller
                 ->send();
         }
 
-         $driver= firstOf($this->driver_contract->findBy('s_id',$s_id));
-         //if no driver
-         if(!$driver) {
+        $driver = firstOf($this->driver_contract->findBy('s_id', $s_id));
+        //if no driver
+        if (!$driver) {
             return  $this->api_responser
-            ->failed()
-            ->code(403)
-            ->message('No driver found with this s_id')
-            ->send();
+                ->failed()
+                ->code(403)
+                ->message('No driver found with this s_id')
+                ->send();
         }
-         //if a wrong driver sid
-         if($driver && $driver->s_id !== $s_id) {
+        //if a wrong driver sid
+        if ($driver && $driver->s_id !== $s_id) {
 
             return  $this->api_responser
-            ->failed()
-            ->code(403)
-            ->message('You are not authorized to do deal with this pickup request')
-            ->send();
+                ->failed()
+                ->code(403)
+                ->message('You are not authorized to do deal with this pickup request')
+                ->send();
         }
-         //if a wrong qr_code_secret
+        //if a wrong qr_code_secret
 
-         if($pickup_request && $pickup_request->client_arrival_qr_code_secret !== $request->secret_code) {
+        if ($pickup_request && $pickup_request->client_arrival_qr_code_secret !== $request->secret_code) {
 
             return  $this->api_responser
-            ->failed()
-            ->code(403)
-            ->message('wrong secret_code provided')
-            ->send();
+                ->failed()
+                ->code(403)
+                ->message('wrong secret_code provided')
+                ->send();
         }
         //TODO:add if client_reached_at later
-        $pickup_request = $this->pickup_request_contract->confirmReachedToDestination($pickup_sid,$request->date_confirmed);
+        $pickup_request = $this->pickup_request_contract->confirmReachedToDestination($pickup_sid, $request->date_confirmed);
+
+        return  $this->api_responser
+            ->success()
+            ->code(200)
+            ->message('Client destination Reached successfully')
+            ->send();
+    }
+    /**
+     * @OA\Post(
+     * path="/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/cancel",
+     * operationId="cancel pickup request after approve it",
+     * tags={"drivers"},
+     * summary="cancel pickup request after approve it",
+     * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+     * @OA\Parameter(  name="pickup_sid", in="path", description="pickup secret id ", required=true),
+     *    @OA\Response( response=200, description="Pickup request cancelled successfully", @OA\JsonContent() ),
+     *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *    @OA\Response( response=404, description="No pickup request exists with the given s_id", @OA\JsonContent() ),
+     *    @OA\Response( response=403, description="You are not authorized to do deal with this pickup request", @OA\JsonContent() ),
+     *    @OA\Response( response=204, description="Pickup request has been canceled by client", @OA\JsonContent() ),
+     *     )
+     */
+    public function CancelPickupRequestAfterApprove($s_id, $pickup_sid)
+    {
+        $pickup = $this->pickup_request_contract->findByWithDriver('s_id', $pickup_sid);
+
+        if (!$pickup) {
+            return  $this->api_responser
+                ->failed()
+                ->code(404)
+                ->message('No Pickup request exists with the given s_id')
+                ->send();
+        }
+        //if is canceled by client
+        if ($pickup->status == PickupRequestStatus::CANCELED->value) {
+            return  $this->api_responser
+                ->failed()
+                ->code(204)
+                ->message('Pickup request has been canceled by client')
+                ->send();
+        }
+        //if is not the current pickup driver
+        if ($s_id !== $pickup->driver_s_id) {
 
             return  $this->api_responser
-                ->success()
-                ->code(200)
-                ->message('Client destination Reached successfully')
+                ->failed()
+                ->code(403)
+                ->message('You are not authorized to do deal with this pickup request')
                 ->send();
+        }
+        //send event to client
+        event(new PickupRequestCancelled($pickup));
 
+        //remove driver from list
+       $pickup_request = firstOf($this->pickup_request_contract->findBy('s_id', $pickup_sid));
+
+       $drivers = json_decode($pickup_request->drivers, true);
+
+
+       foreach ($drivers as $key => $driver) {
+
+           if ($driver['s_id'] == $s_id) {
+               unset($drivers[$key]);
+               break;
+           }
+       }
+       $drivers = array_values($drivers);
+
+       $pickup_request = $this->pickup_request_contract->update(
+           $pickup_sid,
+           [
+            'drivers' => json_encode($drivers),
+            'status'=>PickupRequestStatus::PENDING->value,
+            'driver_id'=>null
+            ]
+       );
+       //if no driver still available
+       if (!count($drivers)) {
+           event(new NoDriverAvailable($pickup_request));
+           return  $this->api_responser
+               ->success()
+               ->code(200)
+               ->message('No driver still available')
+               ->send();
+       }
+        //calling the next driver
+        event(new StartPickupRequestCalling($pickup_request, $drivers[0]));
+
+        return $this->api_responser
+            ->success()
+            ->payload([
+                'pickup_request' =>
+                [
+                    's_id' => $pickup_request->s_id,
+                    'location' => $pickup_request->location,
+                    'destination' => $pickup_request->destination,
+                    'estimated_price' => $pickup_request->estimated_price,
+                    'estimated_duration' => $pickup_request->estimated_duration,
+                    'driver' =>
+                    [
+                        's_id' => $drivers[0]['s_id'],
+                        'full_name' => array_key_exists('full_name',$drivers[0]) ? $drivers[0]['full_name'] :  $drivers[0]['first_name'] . ' ' . $drivers[0]['last_name'],
+                        'phone_number' => $drivers[0]['phone_number'],
+                        'location' => $drivers[0]['location'],
+                        'photo' => url('storage/drivers/photos/' . $drivers[0]['photo']),
+                    ]
+                ]
+            ])
+            ->message('Pickup request canceleled successfully')
+            ->send();
     }
+
 }

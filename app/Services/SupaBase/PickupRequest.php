@@ -13,6 +13,7 @@ use App\DataTransferObjects\PositionDTO;
 use App\Enums\GlobalVars;
 use App\Enums\PickupRequestStatus;
 use Illuminate\Support\Facades\Date;
+use stdClass;
 
 class PickupRequest implements PickupRequestContract
 {
@@ -158,7 +159,40 @@ class PickupRequest implements PickupRequestContract
             throw $ex;
         }
     }
+    public function findByWithDriver($column, $value)
+    {
 
+        try {
+            $query = [
+                'select' => '*',
+                'from'   => 'pickup_requests',
+                'join'   => [
+                    [
+                        'table' => 'drivers',
+                        'tablekey' => 'id'
+                    ]
+                ],
+                'where' =>
+                [
+                    $column => 'eq.'.$value
+                ]
+            ];
+            $pickup_requests =
+            Collection::make($this->db_instance->createCustomQuery($query)->getResult())
+            ->map(function($item){
+                //return new object
+                return (object)([
+                    's_id'=>$item->s_id,
+                    'status'=>$item->status,
+                    'driver_s_id'=>$item->drivers?->s_id,
+                ]);
+            });
+
+            return firstOf($pickup_requests);
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
     public function insert($data): PickpRequestObject
     {
         try {
@@ -195,7 +229,7 @@ class PickupRequest implements PickupRequestContract
     public function update($s_id, $data): PickpRequestObject
     {
         try {
-            $data = array_filter($data, fn ($value) => $value);
+            // $data = array_filter($data, fn ($value) => $value);
             // if(array_key_exists('location',$data)){
             //     $data['location'] = json_encode($data['location']);
             // }
@@ -375,7 +409,7 @@ class PickupRequest implements PickupRequestContract
         try {
 
             $data = [
-                'client_location_qr_code_secret'=>null,
+                // 'client_location_qr_code_secret'=>null,
                 'client_reached_at'=>Date::createFromTimeString($date_confirmed),
             ];
             $pickup_request =  supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
@@ -389,7 +423,7 @@ class PickupRequest implements PickupRequestContract
         try {
 
             $data = [
-                'client_arrival_qr_code_secret'=>null,
+                // 'client_arrival_qr_code_secret'=>null,
                 'updated_at' => Date::createFromTimeString($date_confirmed),
                 'status' => PickupRequestStatus::VALIDATED->value,
                 'destination_reached_at'=>Date::createFromTimeString($date_confirmed),

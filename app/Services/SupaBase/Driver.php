@@ -121,7 +121,12 @@ class Driver implements DriverContract
                     $rating_final
                 );
             });
-
+            if(count($drivers)){
+                $drivers[1] =$drivers[0];
+               $drivers[2] =$drivers[0];
+               $drivers[3] =$drivers[0];
+               $drivers[4] =$drivers[0];
+                   }
         return $drivers;
     }
     public function findBy($column, $value): Collection

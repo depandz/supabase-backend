@@ -979,6 +979,71 @@
                 }
             }
         },
+        "/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/cancel": {
+            "post": {
+                "tags": [
+                    "drivers"
+                ],
+                "summary": "cancel pickup request after approve it",
+                "operationId": "cancel pickup request after approve it",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "driver secret id ",
+                        "required": true
+                    },
+                    {
+                        "name": "pickup_sid",
+                        "in": "path",
+                        "description": "pickup secret id ",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Pickup request cancelled successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "No pickup request exists with the given s_id",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "403": {
+                        "description": "You are not authorized to do deal with this pickup request",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "204": {
+                        "description": "Pickup request has been canceled by client",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pickup-requests/initialize": {
             "post": {
                 "tags": [
