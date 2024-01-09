@@ -5,6 +5,7 @@ namespace App\Contracts;
 use Illuminate\Http\File;
 use App\DataTransferObjects\DriverDTO as DriverObject;
 use Illuminate\Support\Collection;
+use PhpParser\Node\Expr\Cast\Object_;
 
 interface DriverContract extends SupaBaseContract
 {
@@ -21,4 +22,6 @@ interface DriverContract extends SupaBaseContract
     public function findByProvince(int $province_id): Collection;
 
     public function switchOnlineStatus(string $s_id, bool $status): bool|null;
+
+    public function getDriverProvince(string $s_id) :int|null;
 }

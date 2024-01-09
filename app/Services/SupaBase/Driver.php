@@ -329,4 +329,23 @@ class Driver implements DriverContract
             throw $ex;
         }
     }
+    public function getDriverProvince(string $s_id): int|null
+    {
+
+        try {
+            $query = [
+                'select' => 'id,province_id',
+                'from'   => 'drivers',
+                'where' =>
+                [
+                    's_id' => 'eq.' . $s_id
+                ]
+            ];
+            $drivers = Collection::make($this->db_instance->createCustomQuery($query)->getResult());
+
+            return firstOf($drivers)->province_id;
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
 }

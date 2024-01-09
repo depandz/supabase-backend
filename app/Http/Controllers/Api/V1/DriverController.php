@@ -604,6 +604,7 @@ class DriverController extends Controller
      */
     public function CancelPickupRequestAfterApprove($s_id, $pickup_sid)
     {
+
         $pickup = $this->pickup_request_contract->findByWithDriver('s_id', $pickup_sid);
 
         if (!$pickup) {
@@ -658,12 +659,31 @@ class DriverController extends Controller
        );
        //if no driver still available
        if (!count($drivers)) {
-           event(new NoDriverAvailable($pickup_request));
-           return  $this->api_responser
-               ->success()
-               ->code(200)
-               ->message('No driver still available')
-               ->send();
+
+            //get the current driver province to refill the drivers list
+             $province_id = $this->driver_contract->getDriverProvince($s_id);
+             $new_drivers = $this->driver_contract->findByProvince($province_id);
+             foreach ($new_drivers as $key => $driver) {
+
+                if ($driver->s_id == $s_id) {
+                    unset($new_drivers[$key]);
+                    break;
+                }
+            }
+            $new_drivers = array_values($new_drivers->toArray());
+             $pickup_request = $this->pickup_request_contract->update(
+                $pickup_sid,
+                [
+                 'drivers' => json_encode($new_drivers)
+                 ]
+            );
+            $drivers  = json_decode($pickup_request->drivers, true);
+        //    event(new NoDriverAvailable($pickup_request));
+        //    return  $this->api_responser
+        //        ->success()
+        //        ->code(200)
+        //        ->message('No driver still available')
+        //        ->send();
        }
         //calling the next driver
         event(new StartPickupRequestCalling($pickup_request, $drivers[0]));
@@ -678,14 +698,6 @@ class DriverController extends Controller
                     'destination' => $pickup_request->destination,
                     'estimated_price' => $pickup_request->estimated_price,
                     'estimated_duration' => $pickup_request->estimated_duration,
-                    'driver' =>
-                    [
-                        's_id' => $drivers[0]['s_id'],
-                        'full_name' => array_key_exists('full_name',$drivers[0]) ? $drivers[0]['full_name'] :  $drivers[0]['first_name'] . ' ' . $drivers[0]['last_name'],
-                        'phone_number' => $drivers[0]['phone_number'],
-                        'location' => $drivers[0]['location'],
-                        'photo' => url('storage/drivers/photos/' . $drivers[0]['photo']),
-                    ]
                 ]
             ])
             ->message('Pickup request canceleled successfully')
