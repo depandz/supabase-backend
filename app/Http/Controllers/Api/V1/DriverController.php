@@ -703,5 +703,44 @@ class DriverController extends Controller
             ->message('Pickup request canceleled successfully')
             ->send();
     }
+        /**
+     * @OA\Get(
+     * path="/api/v1/drivers/{s_id}/today-revenus",
+     * operationId="get driver today revenus",
+     * tags={"drivers"},
+     * summary="get driver  today revenus",
+     * description="get driver today revenus",
+     * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+     * @OA\Response( response=200, description="driver  revenus fetched successfully", @OA\JsonContent() ),
+     * @OA\Response( response=404,description="no driver found", @OA\JsonContent()),
+     * @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *     )
+     */
+    public function todayRevenus($s_id)
+    {
+        try {
+            $driver = firstOf($this->driver_contract->findBy('s_id', $s_id));
+            if ($driver) {
+                $pickups = $this->pickup_request_contract->todayRevenus(id: $driver->id);
+
+                return $this->api_responser
+                    ->success()
+                    ->message('Driver  pickups history fetched successfully')
+                    ->payload($pickups)
+                    ->send();
+            }
+            return $this->api_responser
+                ->failed()
+                ->code(404)
+                ->message('no driver found')
+                ->send();
+        } catch (Exception $ex) {
+
+            return $this->api_responser
+                ->failed($ex->getCode())
+                ->message($ex->getMessage())
+                ->send();
+        }
+    }
 
 }

@@ -33,4 +33,7 @@ interface PickupRequestContract extends SupaBaseContract
     public function findByWithSecrets(string $column, string $value): PickupRequest|null;
 
     public function findByWithDriver(string $column, string $value);
+
+    //driver revenus
+    public function todayRevenus(int $id);
 }

@@ -52,6 +52,7 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::post('{s_id}/pickup-requests/{pickup_sid}/confirm-reached-to-destination','confirmReachedToDestination');
         Route::put('{s_id}/switch-online-status','switchOnlineStatus');
         Route::get('{s_id}/pickups-history','pickupsHistory');
+        Route::get('{s_id}/today-revenus','todayRevenus');
 
     });
     Route::controller(PickupRequestController::class)->prefix('pickup-requests')->group(function(){

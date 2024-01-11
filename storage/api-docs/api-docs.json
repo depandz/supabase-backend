@@ -1044,6 +1044,50 @@
                 }
             }
         },
+        "/api/v1/drivers/{s_id}/today-revenus": {
+            "get": {
+                "tags": [
+                    "drivers"
+                ],
+                "summary": "get driver  today revenus",
+                "description": "get driver today revenus",
+                "operationId": "get driver today revenus",
+                "parameters": [
+                    {
+                        "name": "s_id",
+                        "in": "path",
+                        "description": "driver secret id ",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "driver  revenus fetched successfully",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "404": {
+                        "description": "no driver found",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "internal server error",
+                        "content": {
+                            "application/json": {
+                                "schema": {}
+                            }
+                        }
+                    }
+                }
+            }
+        },
         "/api/v1/pickup-requests/initialize": {
             "post": {
                 "tags": [

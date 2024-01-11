@@ -3,17 +3,18 @@
 namespace App\Services\SupaBase;
 
 use DateTime;
+use stdClass;
 use Exception;
-use App\Contracts\PickupRequestContract;
-use App\DataTransferObjects\DriverDTO as Driver;
-use Illuminate\Support\Collection;
-use Illuminate\Validation\ValidationException;
-use App\DataTransferObjects\PickupRequestDTO as PickpRequestObject;
-use App\DataTransferObjects\PositionDTO;
+use Carbon\Carbon;
 use App\Enums\GlobalVars;
 use App\Enums\PickupRequestStatus;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\Date;
-use stdClass;
+use App\Contracts\PickupRequestContract;
+use App\DataTransferObjects\PositionDTO;
+use Illuminate\Validation\ValidationException;
+use App\DataTransferObjects\DriverDTO as Driver;
+use App\DataTransferObjects\PickupRequestDTO as PickpRequestObject;
 
 class PickupRequest implements PickupRequestContract
 {
@@ -430,6 +431,31 @@ class PickupRequest implements PickupRequestContract
             ];
             $pickup_request =  supabase_instance()->initializeDatabase('pickup_requests', 's_id')->update($s_id, $data);
             return $pickup_request[0] ? true :false;
+        } catch (Exception $ex) {
+            throw $ex;
+        }
+    }
+    public function todayRevenus(int $id)
+    {
+        try {
+            $query = [
+                'select' => 'location,destination,date_requested,estimated_distance,estimated_price,estimated_duration,status,destination_reached_at',
+                'from'   => 'pickup_requests',
+                'where' =>
+                [
+                    'status' => 'eq.validated',
+                    'destination_reached_at'=>'gte.'.Carbon::today()
+                ],
+                // 'order' => 'date_requested.desc'
+            ];
+
+            $pickup_requests = Collection::make($this->db_instance->createCustomQuery($query)->getResult());
+
+            $result = Collection::make([]);
+            $result['total'] = $pickup_requests->sum('estimated_price');
+            $result['pickups'] = $pickup_requests->values();
+            return $result;
+
         } catch (Exception $ex) {
             throw $ex;
         }

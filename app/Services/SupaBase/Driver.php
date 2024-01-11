@@ -204,7 +204,7 @@ class Driver implements DriverContract
             $drivers = Collection::make($this->db_instance->createCustomQuery($query)->getResult())
                 ->map(function ($item) {
                     $item = (array)$item;
-                    $item['company'] = $item['companies'];
+                    $item['company'] = isset($item['companies']) ? $item['companies'] : null;
                     $item['photo'] = Str::contains($item['photo'], 'ui-avatars', true) ? $item['photo'] :
                         url('storage/' . $item['photo']);
                     $item['full_name']  = $item['first_name'] . ' ' . $item['last_name'];
@@ -255,9 +255,9 @@ class Driver implements DriverContract
 
             $driver['photo'] = Str::contains($driver['photo'], 'ui-avatars', true) ? $driver['photo'] :
 
-                $driver['company'] = $driver['companies'];
+            $driver['company'] = isset($driver['companies']) ? $driver['companies'] : null;
 
-            $item['full_name']  = $driver['first_name'] . ' ' . $driver['last_name'];
+                $driver['full_name']  = $driver['first_name'] . ' ' . $driver['last_name'];
             return new DriverObject(
                 $driver['id'],
                 $driver['s_id'],
