@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Date;
 use App\Events\PickupRequestApproved;
 use App\Contracts\PickupRequestContract;
 use App\Events\PickupRequestCancelled;
+use App\Events\SendDriverLocation;
 use App\Events\StartPickupRequestCalling;
 use App\Http\Requests\DriverUpdateRequest;
 
@@ -309,7 +310,7 @@ class DriverController extends Controller
                         'driver' =>
                         [
                             's_id' => $drivers[0]['s_id'],
-                            'full_name' => array_key_exists('full_name',$drivers[0]) ? $drivers[0]['full_name'] :  $drivers[0]['first_name'] . ' ' . $drivers[0]['last_name'],
+                            'full_name' => array_key_exists('full_name', $drivers[0]) ? $drivers[0]['full_name'] :  $drivers[0]['first_name'] . ' ' . $drivers[0]['last_name'],
                             'phone_number' => $drivers[0]['phone_number'],
                             'location' => $drivers[0]['location'],
                             'photo' => url('storage/drivers/photos/' . $drivers[0]['photo']),
@@ -635,35 +636,35 @@ class DriverController extends Controller
         event(new PickupRequestCancelled($pickup));
 
         //remove driver from list
-       $pickup_request = firstOf($this->pickup_request_contract->findBy('s_id', $pickup_sid));
+        $pickup_request = firstOf($this->pickup_request_contract->findBy('s_id', $pickup_sid));
 
-       $drivers = json_decode($pickup_request->drivers, true);
+        $drivers = json_decode($pickup_request->drivers, true);
 
 
-       foreach ($drivers as $key => $driver) {
+        foreach ($drivers as $key => $driver) {
 
-           if ($driver['s_id'] == $s_id) {
-               unset($drivers[$key]);
-               break;
-           }
-       }
-       $drivers = array_values($drivers);
+            if ($driver['s_id'] == $s_id) {
+                unset($drivers[$key]);
+                break;
+            }
+        }
+        $drivers = array_values($drivers);
 
-       $pickup_request = $this->pickup_request_contract->update(
-           $pickup_sid,
-           [
-            'drivers' => json_encode($drivers),
-            'status'=>PickupRequestStatus::PENDING->value,
-            'driver_id'=>null
+        $pickup_request = $this->pickup_request_contract->update(
+            $pickup_sid,
+            [
+                'drivers' => json_encode($drivers),
+                'status' => PickupRequestStatus::PENDING->value,
+                'driver_id' => null
             ]
-       );
-       //if no driver still available
-       if (!count($drivers)) {
+        );
+        //if no driver still available
+        if (!count($drivers)) {
 
             //get the current driver province to refill the drivers list
-             $province_id = $this->driver_contract->getDriverProvince($s_id);
-             $new_drivers = $this->driver_contract->findByProvince($province_id);
-             foreach ($new_drivers as $key => $driver) {
+            $province_id = $this->driver_contract->getDriverProvince($s_id);
+            $new_drivers = $this->driver_contract->findByProvince($province_id);
+            foreach ($new_drivers as $key => $driver) {
 
                 if ($driver->s_id == $s_id) {
                     unset($new_drivers[$key]);
@@ -671,20 +672,20 @@ class DriverController extends Controller
                 }
             }
             $new_drivers = array_values($new_drivers->toArray());
-             $pickup_request = $this->pickup_request_contract->update(
+            $pickup_request = $this->pickup_request_contract->update(
                 $pickup_sid,
                 [
-                 'drivers' => json_encode($new_drivers)
-                 ]
+                    'drivers' => json_encode($new_drivers)
+                ]
             );
             $drivers  = json_decode($pickup_request->drivers, true);
-        //    event(new NoDriverAvailable($pickup_request));
-        //    return  $this->api_responser
-        //        ->success()
-        //        ->code(200)
-        //        ->message('No driver still available')
-        //        ->send();
-       }
+            //    event(new NoDriverAvailable($pickup_request));
+            //    return  $this->api_responser
+            //        ->success()
+            //        ->code(200)
+            //        ->message('No driver still available')
+            //        ->send();
+        }
         //calling the next driver
         event(new StartPickupRequestCalling($pickup_request, $drivers[0]));
 
@@ -703,7 +704,7 @@ class DriverController extends Controller
             ->message('Pickup request canceleled successfully')
             ->send();
     }
-        /**
+    /**
      * @OA\Get(
      * path="/api/v1/drivers/{s_id}/today-revenus",
      * operationId="get driver today revenus",
@@ -742,5 +743,62 @@ class DriverController extends Controller
                 ->send();
         }
     }
+    /**
+     * @OA\Post(
+     * path="/api/v1/drivers/{s_id}/pickup-requests/{pickup_sid}/send-location",
+     * operationId="send driver location to client",
+     * tags={"drivers"},
+     * summary="send driver location to client",
+     * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
+     * @OA\Parameter(  name="pickup_sid", in="path", description="pickup secret id ", required=true),
+     *    @OA\Response( response=200, description="location sent successfully", @OA\JsonContent() ),
+     *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
+     *    @OA\Response( response=404, description="No driver found with the given s_id", @OA\JsonContent() ),
+     *    @OA\Response( response=403, description="You are not authorized to do deal with this pickup request", @OA\JsonContent() ),
+     *    @OA\Response( response=204, description="Pickup request has been canceled by client", @OA\JsonContent() ),
+     *     )
+     */
+    public function sendLocation($s_id, $pickup_sid)
+    {
+        try {
+            $pickup = $this->pickup_request_contract->findByWithDriver('s_id', $pickup_sid);
 
+            if (!$pickup) {
+                return  $this->api_responser
+                    ->failed()
+                    ->code(404)
+                    ->message('No Pickup request exists with the given s_id')
+                    ->send();
+            }
+            //if is canceled by client
+            if ($pickup->status == PickupRequestStatus::CANCELED->value) {
+                return  $this->api_responser
+                    ->failed()
+                    ->code(204)
+                    ->message('Pickup request has been canceled by client')
+                    ->send();
+            }
+            //if is not the current pickup driver
+            if ($s_id !== $pickup->driver_s_id) {
+
+                return  $this->api_responser
+                    ->failed()
+                    ->code(403)
+                    ->message('You are not authorized to do deal with this pickup request')
+                    ->send();
+            }
+            event(new SendDriverLocation($pickup));
+            return $this->api_responser
+            ->success()
+            ->message('location sent successfully')
+            ->send();
+
+        } catch (Exception $ex) {
+
+            return $this->api_responser
+                ->failed($ex->getCode())
+                ->message($ex->getMessage())
+                ->send();
+        }
+    }
 }

@@ -250,6 +250,9 @@ class Driver implements DriverContract
             if ($data['location']) {
                 $data['location'] = json_decode($data['location']);
             }
+            if (isset($data['phone_number'])) {
+                $data['phone_number'] = ltrim($data['phone_number'],'+');
+            }
             $driver  = supabase_instance()->initializeDatabase('drivers', 's_id')->update($s_id, $data);
             $driver =  (array)$driver[0];
 

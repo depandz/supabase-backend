@@ -53,7 +53,7 @@ Route::group(['as' => 'api_v1.'], function () {
         Route::put('{s_id}/switch-online-status','switchOnlineStatus');
         Route::get('{s_id}/pickups-history','pickupsHistory');
         Route::get('{s_id}/today-revenus','todayRevenus');
-
+        Route::post('{s_id}/pickup-requests/{pickup_sid}/send-location','sendLocation');
     });
     Route::controller(PickupRequestController::class)->prefix('pickup-requests')->group(function(){
         Route::post('/initialize','initialize');

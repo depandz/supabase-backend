@@ -186,6 +186,7 @@ class PickupRequest implements PickupRequestContract
                     's_id'=>$item->s_id,
                     'status'=>$item->status,
                     'driver_s_id'=>$item->drivers?->s_id,
+                    'location'=>$item->drivers?->location,
                 ]);
             });
 
@@ -438,13 +439,14 @@ class PickupRequest implements PickupRequestContract
     public function todayRevenus(int $id)
     {
         try {
+            //TODO:do not forget to remove comment
             $query = [
                 'select' => 'location,destination,date_requested,estimated_distance,estimated_price,estimated_duration,status,destination_reached_at',
                 'from'   => 'pickup_requests',
                 'where' =>
                 [
                     'status' => 'eq.validated',
-                    'destination_reached_at'=>'gte.'.Carbon::today()
+                    //'destination_reached_at'=>'gte.'.Carbon::today()
                 ],
                 // 'order' => 'date_requested.desc'
             ];
