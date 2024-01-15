@@ -533,7 +533,7 @@
                                     "location": {
                                         "type": "object",
                                         "example": {
-                                            "lang": "45558",
+                                            "lng": "45558",
                                             "lat": "4587.00"
                                         }
                                     },

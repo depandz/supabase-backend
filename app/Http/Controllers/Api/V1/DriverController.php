@@ -138,7 +138,7 @@ class DriverController extends Controller
      *             @OA\Schema(
      *                 @OA\Property( property="full_name",type="string",nullable=true),
      *                 @OA\Property(property="phone_number",type="string",nullable=true),
-     *                 @OA\Property(property="location",type="object",example={"lang":"45558","lat":"4587.00"}),
+     *                 @OA\Property(property="location",type="object",example={"lng":"45558","lat":"4587.00"}),
      *                 @OA\Property(property="email",type="string",nullable=true),
      *                 @OA\Property(property="messaging_token",type="string",nullable=true),
      *             )),
