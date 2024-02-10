@@ -20,7 +20,7 @@ class SendDriverLocation implements ShouldBroadcast
      /**
      * Create a new event instance.
      */
-    public function __construct(public $pickup)
+    public function __construct(public $pickup,public $request)
     { }
 
     /**
@@ -43,7 +43,7 @@ class SendDriverLocation implements ShouldBroadcast
     public function broadcastWith(): array
     {
         return [
-                'location'=>$this->pickup->location
+                'location'=>$this->request
             ];
     }
 }

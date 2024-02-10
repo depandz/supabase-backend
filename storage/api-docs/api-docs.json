@@ -1109,6 +1109,28 @@
                         "required": true
                     }
                 ],
+                "requestBody": {
+                    "content": {
+                        "application/x-www-form-urlencoded": {
+                            "schema": {
+                                "properties": {
+                                    "lat": {
+                                        "type": "integer",
+                                        "example": "36.3469"
+                                    },
+                                    "lng": {
+                                        "type": "integer",
+                                        "example": "6.7760"
+                                    }
+                                },
+                                "type": "object"
+                            }
+                        },
+                        "application/json": {
+                            "schema": {}
+                        }
+                    }
+                },
                 "responses": {
                     "200": {
                         "description": "location sent successfully",

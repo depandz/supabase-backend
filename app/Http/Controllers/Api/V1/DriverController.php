@@ -751,6 +751,15 @@ class DriverController extends Controller
      * summary="send driver location to client",
      * @OA\Parameter(  name="s_id", in="path", description="driver secret id ", required=true),
      * @OA\Parameter(  name="pickup_sid", in="path", description="pickup secret id ", required=true),
+     *  @OA\RequestBody(
+     *         @OA\JsonContent(),
+     *         @OA\MediaType(
+     *            mediaType="application/x-www-form-urlencoded",
+     *             @OA\Schema(
+     *                 @OA\Property(property="lat",type="integer",example="36.3469"),
+     *                 @OA\Property(property="lng",type="integer",example="6.7760"),
+     *             )),
+     *    ),
      *    @OA\Response( response=200, description="location sent successfully", @OA\JsonContent() ),
      *    @OA\Response(response=500,description="internal server error", @OA\JsonContent() ),
      *    @OA\Response( response=404, description="No driver found with the given s_id", @OA\JsonContent() ),
@@ -758,7 +767,7 @@ class DriverController extends Controller
      *    @OA\Response( response=204, description="Pickup request has been canceled by client", @OA\JsonContent() ),
      *     )
      */
-    public function sendLocation($s_id, $pickup_sid)
+    public function sendLocation($s_id, $pickup_sid,Request $request)
     {
         try {
             $pickup = $this->pickup_request_contract->findByWithDriver('s_id', $pickup_sid);
@@ -787,7 +796,7 @@ class DriverController extends Controller
                     ->message('You are not authorized to do deal with this pickup request')
                     ->send();
             }
-            event(new SendDriverLocation($pickup));
+            event(new SendDriverLocation($pickup,$request->all()));
             return $this->api_responser
             ->success()
             ->message('location sent successfully')
