@@ -12,6 +12,8 @@ use App\Http\Controllers\Controller;
 use Illuminate\Support\Facades\Date;
 use App\Events\PickupRequestApproved;
 use App\Contracts\PickupRequestContract;
+use App\Events\ClientDestinationReached;
+use App\Events\ClientLocationReached;
 use App\Events\PickupRequestCancelled;
 use App\Events\SendDriverLocation;
 use App\Events\StartPickupRequestCalling;
@@ -502,6 +504,7 @@ class DriverController extends Controller
         //TODO:add if client_reached_at later
         $pickup_request = $this->pickup_request_contract->confirmReachedToClient($pickup_sid, $request->date_confirmed);
 
+        event(new ClientLocationReached($pickup_sid));
         return  $this->api_responser
             ->success()
             ->code(200)
@@ -582,6 +585,7 @@ class DriverController extends Controller
         //TODO:add if client_reached_at later
         $pickup_request = $this->pickup_request_contract->confirmReachedToDestination($pickup_sid, $request->date_confirmed);
 
+        event(new ClientDestinationReached($pickup_sid));
         return  $this->api_responser
             ->success()
             ->code(200)
